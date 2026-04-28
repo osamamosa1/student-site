@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Phone, Home, Book, MapPin, Save, Loader2, Camera } from 'lucide-react';
+import { User, Mail, Phone, Home, Book, MapPin, Save, Loader2, Camera, LogOut, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { authApi } from '../api';
 
 const Profile = () => {
@@ -7,6 +8,12 @@ const Profile = () => {
   const [formData, setFormData] = useState({ ...user });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/login');
+  };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -29,7 +36,24 @@ const Profile = () => {
   return (
     <div style={{ background: 'var(--bg-main)', minHeight: '100vh', padding: '3rem' }}>
       <div className="container" style={{ maxWidth: '800px' }}>
-        <h1 style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>My <span className="text-gradient">Profile</span></h1>
+        <header className="space-between" style={{ marginBottom: '2.5rem' }}>
+           <div className="flex" style={{ gap: '1.5rem' }}>
+              <button onClick={() => navigate('/')} className="btn btn-outline centered" style={{ width: '48px', height: '48px', borderRadius: '50%' }}>
+                 <ArrowLeft size={20} />
+              </button>
+              <div>
+                 <h1 style={{ fontSize: '2.5rem' }}>My <span className="text-gradient">Profile</span></h1>
+                 <p style={{ color: 'var(--text-sub)' }}>Manage your information and preferences.</p>
+              </div>
+           </div>
+           <button 
+              onClick={handleLogout}
+              className="btn btn-outline" 
+              style={{ color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.2)' }}
+           >
+              <LogOut size={18} /> Log Out
+           </button>
+        </header>
 
         <form onSubmit={handleUpdate} className="glass-card" style={{ padding: '3rem' }}>
           <div className="centered" style={{ marginBottom: '3rem', flexDirection: 'column', gap: '1rem' }}>

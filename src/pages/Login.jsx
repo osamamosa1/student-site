@@ -1,13 +1,28 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, LogIn, Loader2, GraduationCap } from 'lucide-react';
+import { Mail, Lock, LogIn, Loader2, Globe } from 'lucide-react';
+import axios from 'axios';
+import logo from '../assets/logo.png';
 import { authApi } from '../api';
 
 const Login = () => {
   const [formData, setFormData] = useState({ login: '', password: '' });
   const [loading, setLoading] = useState(false);
+  const [settings, setSettings] = useState(null);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await axios.get('/api/v1/settings/1');
+        setSettings(res.data.data);
+      } catch (err) {
+        console.error("Settings load failed");
+      }
+    };
+    fetchSettings();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -60,11 +75,15 @@ const Login = () => {
   return (
     <div className="login-container centered" style={{ minHeight: '100vh', padding: '2rem' }}>
       <div className="glass-card login-card fade-in" style={{ width: '100%', maxWidth: '420px', padding: '3rem 2.5rem' }}>
-        <div className="centered" style={{ marginBottom: '2rem', flexDirection: 'column', gap: '0.5rem' }}>
-          <div className="glass centered" style={{ width: '64px', height: '64px', borderRadius: '1rem', background: 'linear-gradient(135deg, var(--primary), var(--secondary))' }}>
-            <GraduationCap size={32} color="white" />
+        <div className="centered" style={{ marginBottom: '2rem', flexDirection: 'column', gap: '0.8rem' }}>
+          <div className="glass centered" style={{ width: '80px', height: '80px', borderRadius: '1.25rem', overflow: 'hidden', background: 'white' }}>
+            {settings?.logo_url ? (
+                <img src={settings.logo_url} style={{ width: '100%', height: '100%', objectFit: 'contain' }} alt="Logo" />
+            ) : (
+                <Globe size={40} color="var(--primary)" />
+            )}
           </div>
-          <h2 style={{ fontSize: '1.75rem' }}>Welcome Back</h2>
+          <h2 style={{ fontSize: '1.75rem', textAlign: 'center' }}>{settings?.app_name || "Welcome Back"}</h2>
           <p style={{ color: 'var(--text-sub)', fontSize: '0.875rem' }}>Login to your student account</p>
         </div>
 

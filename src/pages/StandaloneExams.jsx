@@ -22,7 +22,12 @@ const StandaloneExams = () => {
     const fetchExams = async () => {
       try {
         const response = await studentApi.getStandaloneExams();
-        setExams(response.data || []);
+        const now = new Date();
+        const filteredExams = (response.data || []).filter(exam => {
+          const startDate = new Date(exam.start_date);
+          return now >= startDate;
+        });
+        setExams(filteredExams);
       } catch (err) {
         console.error(err);
       } finally {

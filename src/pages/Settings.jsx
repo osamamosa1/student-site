@@ -12,12 +12,30 @@ import {
   Award, 
   LogOut,
   ChevronLeft,
-  ArrowLeft
+  ArrowLeft,
+  PlayCircle,
+  MessageCircle,
+  X
 } from 'lucide-react';
+import { homeApi } from '../api';
 
 const Settings = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('mps_user') || '{}');
+  const [settings, setSettings] = React.useState(null);
+  const [showContact, setShowContact] = React.useState(false);
+
+  React.useEffect(() => {
+    const fetchSettings = async () => {
+       try {
+          const res = await homeApi.getStudentHome();
+          setSettings(res.data.platform_settings);
+       } catch (err) {
+          console.error(err);
+       }
+    };
+    fetchSettings();
+  }, []);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -28,7 +46,7 @@ const Settings = () => {
     {
       title: 'Settings & Support',
       items: [
-        { id: '1', title: 'Contact Us', icon: <Phone size={20} />, path: '/support' },
+        { id: '1', title: 'Contact Us', icon: <Phone size={20} />, action: () => setShowContact(true) },
         { id: '2', title: 'Privacy & Security', icon: <ShieldCheck size={20} />, path: '/privacy' },
         { id: '3', title: 'About App', icon: <Info size={20} />, path: '/about' },
         { id: '4', title: 'Terms & Conditions', icon: <FileText size={20} />, path: '/terms' },
@@ -83,7 +101,7 @@ const Settings = () => {
                   {section.items.map((item, idx) => (
                      <div 
                         key={item.id} 
-                        onClick={() => navigate(item.path)}
+                        onClick={() => item.action ? item.action() : navigate(item.path)}
                         className="flexCenteredV" 
                         style={{ 
                            padding: '1.25rem 1rem', 
@@ -105,6 +123,54 @@ const Settings = () => {
                </div>
             </div>
          ))}
+
+         {/* Contact Modal */}
+         {showContact && (
+            <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
+               <div className="glass-card fade-in" style={{ background: 'white', width: '100%', maxWidth: '400px', padding: '2rem', position: 'relative' }}>
+                  <button onClick={() => setShowContact(false)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: '#f1f5f9', border: 'none', width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer' }}><X size={16} /></button>
+                  
+                  <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                     <div className="centered" style={{ width: '60px', height: '60px', borderRadius: '1.25rem', background: 'rgba(79, 70, 229, 0.05)', margin: '0 auto 1rem', color: 'var(--primary)' }}>
+                        <Phone size={28} />
+                     </div>
+                     <h3 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Contact Us</h3>
+                     <p style={{ color: '#64748b', fontSize: '0.9rem' }}>We are always here to help you</p>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                     {settings?.whatsapp_number && (
+                        <a href={`https://wa.me/${settings.whatsapp_number}`} target="_blank" className="flexCenteredV" style={{ gap: '1rem', padding: '1rem', borderRadius: '1.25rem', background: 'rgba(37, 211, 102, 0.05)', color: '#25d366', textDecoration: 'none', border: '1px solid rgba(37, 211, 102, 0.1)' }}>
+                           <MessageCircle size={20} />
+                           <div style={{ flex: 1 }}>
+                              <p style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', opacity: 0.7 }}>WhatsApp</p>
+                              <p style={{ fontSize: '1rem', fontWeight: 700 }}>{settings.whatsapp_number}</p>
+                           </div>
+                           <ChevronRight size={18} />
+                        </a>
+                     )}
+                     
+                     {settings?.facebook_url && (
+                        <a href={settings.facebook_url} target="_blank" className="flexCenteredV" style={{ gap: '1rem', padding: '1rem', borderRadius: '1.25rem', background: 'rgba(24, 119, 242, 0.05)', color: '#1877f2', textDecoration: 'none', border: '1px solid rgba(24, 119, 242, 0.1)' }}>
+                           <Globe size={20} />
+                           <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>Facebook Page</span>
+                           <div style={{ flex: 1 }} />
+                           <ChevronRight size={18} />
+                        </a>
+                     )}
+
+                     {settings?.youtube_url && (
+                        <a href={settings.youtube_url} target="_blank" className="flexCenteredV" style={{ gap: '1rem', padding: '1rem', borderRadius: '1.25rem', background: 'rgba(255, 0, 0, 0.05)', color: '#ff0000', textDecoration: 'none', border: '1px solid rgba(255, 0, 0, 0.1)' }}>
+                           <PlayCircle size={20} />
+                           <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>YouTube Channel</span>
+                           <div style={{ flex: 1 }} />
+                           <ChevronRight size={18} />
+                        </a>
+                     )}
+                  </div>
+               </div>
+            </div>
+         )}
       </div>
       
       <style>{`

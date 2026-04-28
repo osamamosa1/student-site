@@ -20,12 +20,14 @@ const CourseDetails = () => {
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [platformSettings, setPlatformSettings] = useState(null);
 
   useEffect(() => {
     const fetchDetails = async () => {
       try {
         const response = await studentApi.getCourseDetails(id);
         setCourse(response.data);
+        setPlatformSettings(response.platform_settings);
       } catch (err) {
         console.error(err);
       } finally {
@@ -39,6 +41,20 @@ const CourseDetails = () => {
   if (!course) return <div className="centered white">Course not found</div>;
 
   const isEnrolled = course.enrollment?.is_enrolled;
+  const isFree = !course.price || course.price === 0 || course.is_free;
+
+  const handleEnroll = () => {
+    if (isFree) {
+      const firstUnit = course.units?.[0];
+      if (firstUnit) {
+        navigate(`/unit/${firstUnit.id}`);
+      }
+    } else {
+      const msg = encodeURIComponent(`I want to enroll in: ${course.title}`);
+      const waNumber = platformSettings?.whatsapp_number || '201007309722';
+      window.open(`https://wa.me/${waNumber}?text=${msg}`, '_blank');
+    }
+  };
 
   return (
     <div style={{ background: '#f8faff', minHeight: '100vh', paddingBottom: '100px' }}>
@@ -55,21 +71,21 @@ const CourseDetails = () => {
            <div style={{ width: '45px' }} />
         </header>
 
-        <div className="container" style={{ marginTop: '2rem', position: 'relative', zIndex: 10 }}>
+      <div className="container" style={{ marginTop: '2rem', position: 'relative', zIndex: 10 }}>
            <span style={{ background: 'rgba(255,255,255,0.15)', color: 'white', padding: '0.4rem 1rem', borderRadius: '2rem', fontSize: '0.8rem', fontWeight: 600, border: '1px solid rgba(255,255,255,0.2)' }}>
              {course.subject?.name} • {course.grade?.name}
            </span>
-           <h1 style={{ color: 'white', fontSize: '2.5rem', marginTop: '1rem', letterSpacing: '-1px' }}>{course.title}</h1>
+           <h1 style={{ color: 'white', fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', marginTop: '1rem', letterSpacing: '-1px' }}>{course.title}</h1>
         </div>
       </div>
 
       <div className="container" style={{ marginTop: '-40px', position: 'relative', zIndex: 20 }}>
-         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
+         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
             
             {/* Left Column: Overview & Units */}
             <div>
                {/* Stats Bar */}
-               <div className="glass-card" style={{ padding: '1.5rem 2rem', display: 'flex', gap: '3rem', marginBottom: '2.5rem', background: 'white' }}>
+               <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '1.5rem', justifyContent: 'space-around', marginBottom: '2.5rem', background: 'white' }}>
                   <div className="flexCenteredV" style={{ gap: '0.75rem' }}>
                      <div style={{ padding: '0.75rem', background: 'rgba(79, 70, 229, 0.05)', borderRadius: '1rem' }}><BookOpen color="var(--primary)" size={20} /></div>
                      <div><p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Lessons</p><p style={{ fontWeight: 700, color: '#0f172a' }}>{course.lessons_count}</p></div>
@@ -85,12 +101,12 @@ const CourseDetails = () => {
                </div>
 
                {/* Description */}
-               <div className="glass-card" style={{ padding: '2.5rem', marginBottom: '2.5rem', background: 'white' }}>
+               <div className="glass-card" style={{ padding: 'clamp(1.5rem, 5vw, 2.5rem)', marginBottom: '2.5rem', background: 'white' }}>
                   <h3 style={{ marginBottom: '1.25rem', color: '#0f172a' }}>About this Course</h3>
                   <p style={{ color: '#64748b', fontSize: '1.05rem', lineHeight: '1.7' }}>{course.description}</p>
                </div>
 
-               {/* Units List (Matching Flutter CourseDetailsModuleItem) */}
+               {/* Units List */}
                <h3 style={{ marginBottom: '1.5rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <div style={{ width: '4px', height: '20px', background: 'var(--primary)', borderRadius: '2px' }} />
                   Curriculum Units
@@ -103,10 +119,10 @@ const CourseDetails = () => {
                       style={{ 
                         padding: '1.25rem 1.5rem', 
                         background: 'white', 
-                        cursor: isEnrolled ? 'pointer' : 'default',
+                        cursor: (isEnrolled || isFree) ? 'pointer' : 'default',
                         transition: 'var(--transition)'
                       }}
-                      onClick={() => isEnrolled ? navigate(`/unit/${unit.id}`) : null}
+                      onClick={() => (isEnrolled || isFree) ? navigate(`/unit/${unit.id}`) : null}
                     >
                        <div className="space-between">
                           <div className="flexCenteredV" style={{ gap: '1.25rem' }}>
@@ -118,7 +134,7 @@ const CourseDetails = () => {
                                 <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{unit.contents_count || 0} Lessons</p>
                              </div>
                           </div>
-                          {isEnrolled ? (
+                          {(isEnrolled || isFree) ? (
                              <div className="centered" style={{ width: '32px', height: '32px', background: '#f1f5f9', borderRadius: '0.75rem', color: 'var(--primary)' }}>
                                 <ChevronRight size={18} />
                              </div>
@@ -147,11 +163,23 @@ const CourseDetails = () => {
                   <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.5rem' }}>
                      {!isEnrolled ? (
                         <>
-                           <div className="space-between" style={{ marginBottom: '1.5rem' }}>
-                              <span style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Full Course Fee</span>
-                              <span style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a' }}>${course.price}</span>
-                           </div>
-                           <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', height: '3.5rem', fontSize: '1.1rem' }}>Enroll Now</button>
+                           {isFree ? (
+                             <div style={{ padding: '0.75rem 1rem', marginBottom: '1.5rem', background: 'rgba(16, 185, 129, 0.06)', borderRadius: '0.75rem', border: '1px solid rgba(16, 185, 129, 0.15)', textAlign: 'center' }}>
+                               <span style={{ fontSize: '1.5rem', fontWeight: 800, color: '#059669' }}>FREE</span>
+                             </div>
+                           ) : (
+                             <div className="space-between" style={{ marginBottom: '1.5rem' }}>
+                               <span style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Full Course Fee</span>
+                               <span style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a' }}>{course.price} EGP</span>
+                             </div>
+                           )}
+                           <button 
+                             className="btn btn-primary" 
+                             style={{ width: '100%', justifyContent: 'center', height: '3.5rem', fontSize: '1.1rem' }}
+                             onClick={handleEnroll}
+                           >
+                             {isFree ? 'Start Learning' : 'Enroll via WhatsApp'}
+                           </button>
                         </>
                      ) : (
                         <div className="centered" style={{ flexDirection: 'column', gap: '1rem', padding: '1rem', background: 'rgba(16, 185, 129, 0.05)', borderRadius: '1rem', border: '1px solid rgba(16, 185, 129, 0.1)' }}>
@@ -169,10 +197,12 @@ const CourseDetails = () => {
          </div>
       </div>
 
-      {/* Global CSS for white-theme overrides if any */}
       <style>{`
         body { background: #f8faff !important; color: #0f172a !important; }
         .glass-card { box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05) !important; border: 1px solid rgba(0,0,0,0.05) !important; }
+        @media (max-width: 768px) {
+          .grid-responsive { grid-template-columns: 1fr !important; }
+        }
       `}</style>
     </div>
   );

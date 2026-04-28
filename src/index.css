@@ -182,13 +182,20 @@ h1, h2, h3, h4 {
   .container {
     padding: 0 1rem;
   }
-  .space-between {
+  
+  /* Prevent header from turning into column if using specific sub-class */
+  .space-between:not(.no-mobile-col) {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-  .flexCenteredV {
-    flex-wrap: wrap;
+
+  .grid-responsive {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .hide-mobile {
+    display: none !important;
   }
 }
 
@@ -196,5 +203,14 @@ h1, h2, h3, h4 {
   .btn {
     width: 100%;
     justify-content: center;
+  }
+  
+  .logo-container {
+    width: 80px !important;
+    height: 80px !important;
+  }
+  
+  h2 {
+    font-size: 1.25rem !important;
   }
 }

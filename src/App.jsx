@@ -12,6 +12,7 @@ import StandaloneExams from './pages/StandaloneExams';
 import UnitContents from './pages/UnitContents';
 import Settings from './pages/Settings';
 import ExamResultsList from './pages/ExamResultsList';
+import AllCourses from './pages/AllCourses';
 import './index.css';
 
 import { useEffect } from 'react';
@@ -63,29 +64,17 @@ const SecurityLayer = ({ children }) => {
       }
     };
 
-    const handleBlur = () => {
-       document.body.style.filter = 'blur(20px)';
-    };
-
-    const handleFocus = () => {
-       document.body.style.filter = 'none';
-    };
-
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('blur', handleBlur);
-    window.addEventListener('focus', handleFocus);
 
     return () => {
       document.removeEventListener('contextmenu', handleContextMenu);
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('blur', handleBlur);
-      window.removeEventListener('focus', handleFocus);
     };
   }, []);
 
   const user = JSON.parse(localStorage.getItem('mps_user') || '{}');
-  const watermarkText = user.name ? `${user.name} (${user.phone || user.email || 'Student'})` : '';
+  const watermarkText = 'Mr Abdelrahman Shoker';
 
   return (
     <div className="security-wrapper select-none" style={{ position: 'relative', minHeight: '100vh' }}>
@@ -213,6 +202,14 @@ function App() {
                 <ExamResultsList />
               </ProtectedRoute>
             } 
+          />
+          <Route
+            path="/courses"
+            element={
+              <ProtectedRoute>
+                <AllCourses />
+              </ProtectedRoute>
+            }
           />
           {/* Placeholder for future routes */}
           <Route path="*" element={<Navigate to="/" replace />} />

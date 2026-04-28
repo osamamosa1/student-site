@@ -21,7 +21,13 @@ import {
   User,
   Settings
 } from 'lucide-react';
+import logo from '../assets/logo.png';
 import { homeApi, studentApi } from '../api';
+
+const isFree = (price) => {
+  if (price === null || price === undefined || price === '') return true;
+  return parseFloat(price) === 0;
+};
 
 const Dashboard = () => {
   const [homeData, setHomeData] = useState(null);
@@ -76,20 +82,16 @@ const Dashboard = () => {
 
          <div className="container" style={{ position: 'relative', zIndex: 10 }}>
             {/* Top Bar: Profile & Notifications */}
-            <div className="space-between" style={{ marginBottom: '3.5rem' }}>
-               <div className="flexCenteredV" style={{ gap: '1.25rem' }}>
-                  <div className="glass" style={{ width: '56px', height: '56px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)', padding: '2px', overflow: 'hidden' }}>
-                     <img src={user.profile_image_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200'} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-                  </div>
-                  <div>
-                     <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem' }}>Welcome back,</p>
-                     <h2 style={{ color: 'white', fontSize: '1.4rem', fontWeight: 700 }}>{user.name}</h2>
-                  </div>
-               </div>
+            <div className="space-between no-mobile-col" style={{ marginBottom: '3.5rem', flexDirection: 'row', alignItems: 'center' }}>
+                <div className="flexCenteredV" style={{ gap: '1.5rem' }}>
+                   <div className="centered logo-container" style={{ width: '80px', height: '80px', borderRadius: '1.25rem', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)', overflow: 'hidden' }}>
+                      <img src={homeData?.platform_settings?.logo_url || logo} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Logo" />
+                   </div>
+                   <div>
+                      <h2 style={{ color: 'white', fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.5px' }}>{homeData?.platform_settings?.app_name || "Mr Abdelrahman Shoker"}</h2>
+                   </div>
+                </div>
                <div className="flex" style={{ gap: '1rem' }}>
-                  <button className="centered" style={{ width: '50px', height: '50px', borderRadius: '50%', background: 'rgba(255,255,255,0.15)', color: 'white', border: '1px solid rgba(255,255,255,0.2)' }}>
-                     <Bell size={22} />
-                  </button>
                   <button onClick={() => navigate('/settings')} className="centered" style={{ width: '50px', height: '50px', borderRadius: '50%', background: 'rgba(255,255,255,0.15)', color: 'white', border: '1px solid rgba(255,255,255,0.2)' }}>
                      <Settings size={22} />
                   </button>
@@ -108,7 +110,8 @@ const Dashboard = () => {
                   transition: 'all 0.2s',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '1.5rem'
+                  gap: '1.5rem',
+                  flexWrap: 'wrap'
                }}
                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.18)'}
                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
@@ -116,39 +119,69 @@ const Dashboard = () => {
                <div style={{ padding: '0.75rem', background: 'rgba(245, 158, 11, 0.2)', borderRadius: '1rem' }}>
                   <Award color="#fbbf24" size={24} />
                </div>
-               <div style={{ flex: 1 }}>
+               <div style={{ flex: 1, minWidth: '200px' }}>
                   <h4 style={{ color: 'white', fontSize: '1.1rem', fontWeight: 700 }}>Current Events</h4>
                   <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem' }}>Tap here to see all active standalone exams.</p>
                </div>
-               <ArrowRight color="white" opacity={0.6} />
+               <ArrowRight color="white" opacity={0.6} className="hide-mobile" />
             </div>
+            {/* --- ANNOUNCEMENT BANNER --- */}
+            {homeData?.platform_settings?.global_announcement && (
+               <div style={{ marginTop: '2.5rem', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', padding: '1rem 2rem', borderRadius: '1rem', color: '#b45309', fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <Bell size={20} />
+                  <marquee scrollamount="5">{homeData.platform_settings.global_announcement}</marquee>
+               </div>
+            )}
          </div>
       </div>
 
       {/* --- MAIN CONTENT AREA --- */}
       <div className="container" style={{ marginTop: '2.5rem', paddingBottom: '100px' }}>
          
-         {/* Popular Courses Section */}
-         <div className="space-between" style={{ marginBottom: '2rem', padding: '0 0.5rem' }}>
-            <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#1e293b' }}>Famous Courses</h3>
-            <button style={{ color: 'var(--primary)', fontWeight: 700, fontSize: '0.9rem', background: 'none', border: 'none', cursor: 'pointer' }}>See all</button>
+         {/* Famous Courses Section */}
+         <div className="space-between no-mobile-col" style={{ marginBottom: '2rem', padding: '0 0.5rem', flexDirection: 'row', alignItems: 'flex-end' }}>
+            <div>
+               <p style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '0.5rem' }}>Top Curated</p>
+               <h3 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.5px' }}>Famous Courses</h3>
+            </div>
+            <button onClick={() => navigate('/courses?type=popular')} style={{ color: 'var(--primary)', fontWeight: 700, fontSize: '0.9rem', background: 'rgba(79, 70, 229, 0.05)', padding: '0.6rem 1.25rem', borderRadius: '1rem', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', transition: 'all 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(79, 70, 229, 0.1)'} onMouseLeave={e => e.currentTarget.style.background = 'rgba(79, 70, 229, 0.05)'}>See all collection <ArrowRight size={16} /></button>
          </div>
 
-         <div style={{ display: 'flex', gap: '1.5rem', overflowX: 'auto', padding: '0.5rem', marginBottom: '4rem' }} className="no-scrollbar">
-            {homeData?.most_popular_courses?.map(course => (
-               <div 
-                  key={course.id} 
-                  className="glass-card" 
-                  style={{ minWidth: '220px', maxWidth: '220px', padding: '0', overflow: 'hidden', background: 'white' }}
+         <div style={{ display: 'flex', gap: '1.5rem', overflowX: 'auto', padding: '0.5rem 0.25rem 2rem', marginBottom: '2.5rem' }} className="no-scrollbar">
+            {homeData?.most_popular_courses?.slice(0, 8).map(course => (
+               <div
+                  key={course.id}
                   onClick={() => navigate(`/course/${course.id}`)}
+                  style={{ 
+                    minWidth: '260px', 
+                    background: 'white', 
+                    borderRadius: '2rem', 
+                    overflow: 'hidden', 
+                    cursor: 'pointer', 
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.04)', 
+                    border: '1px solid #f1f5f9', 
+                    flexShrink: 0, 
+                    transition: 'all 0.3s ease' 
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 12px 30px rgba(0,0,0,0.08)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.04)'; }}
                >
-                  <img src={course.image_url} style={{ width: '100%', height: '140px', objectFit: 'cover' }} />
+                  <div style={{ position: 'relative', height: '150px', overflow: 'hidden' }}>
+                     <img src={course.image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                     <div style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', background: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(4px)', color: 'white', padding: '0.3rem 0.7rem', borderRadius: '0.75rem', fontSize: '0.75rem', fontWeight: 700 }}>
+                        {isFree(course.price) ? 'FREE' : `${course.price} EGP`}
+                     </div>
+                  </div>
                   <div style={{ padding: '1.25rem' }}>
-                     <h4 style={{ fontSize: '1rem', color: '#1e293b', marginBottom: '1rem', minHeight: '3rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxDirection: 'vertical', overflow: 'hidden' }}>{course.title}</h4>
-                     <div className="space-between">
-                        <div className="flexCenteredV" style={{ gap: '1rem', color: '#64748b', fontSize: '0.75rem' }}>
-                           <span className="flex" style={{ gap: '0.25rem' }}><BookOpen size={14} /> {course.lessons_count}</span>
-                           <span className="flex" style={{ gap: '0.25rem' }}><PlayCircle size={14} /> {course.videos_count}</span>
+                     <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#1e293b', marginBottom: '0.5rem', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{course.title}</h4>
+                     <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '1rem' }}>By {course.teacher?.name}</p>
+                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', gap: '0.75rem', color: 'var(--primary)', fontSize: '0.75rem', fontWeight: 700 }}>
+                           <span className="flexCenteredV" style={{ gap: '0.3rem' }}><BookOpen size={14} /> {course.lessons_count}</span>
+                           <span className="flexCenteredV" style={{ gap: '0.3rem' }}><PlayCircle size={14} /> {course.videos_count}</span>
+                        </div>
+                        <div style={{ background: '#f8fafc', padding: '0.4rem', borderRadius: '0.5rem' }}>
+                           <TrendingUp size={14} color="#94a3b8" />
                         </div>
                      </div>
                   </div>
@@ -156,32 +189,96 @@ const Dashboard = () => {
             ))}
          </div>
 
-         {/* New Courses List */}
+         {/* New Courses Grid */}
          <div style={{ background: 'white', borderRadius: '2rem 2rem 0 0', padding: '2.5rem', boxShadow: '0 -20px 40px rgba(0,0,0,0.03)' }}>
-            <div className="space-between" style={{ marginBottom: '2.5rem' }}>
+            <div className="space-between" style={{ marginBottom: '2rem' }}>
                <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#1e293b' }}>New Courses</h3>
-               <button style={{ color: 'var(--primary)', fontWeight: 700, fontSize: '0.9rem', background: 'none', border: 'none', cursor: 'pointer' }}>See all</button>
+               <button onClick={() => navigate('/courses?type=new')} style={{ color: 'var(--primary)', fontWeight: 700, fontSize: '0.9rem', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>See all <ArrowRight size={16} /></button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-               {homeData?.new_courses?.map(course => (
-                  <div 
-                    key={course.id} 
-                    className="flexCenteredV" 
-                    style={{ padding: '0.75rem', gap: '1.5rem', cursor: 'pointer', borderRadius: '1.5rem', transition: 'all 0.2s' }}
+            {/* Premium New Courses Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
+               {homeData?.new_courses?.slice(0, 6).map(course => (
+                  <div
+                    key={course.id}
                     onClick={() => navigate(`/course/${course.id}`)}
-                    onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                    style={{ 
+                      background: 'white', 
+                      borderRadius: '2rem', 
+                      overflow: 'hidden', 
+                      cursor: 'pointer', 
+                      border: '1px solid #f1f5f9', 
+                      transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                      position: 'relative',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)'
+                    }}
+                    onMouseEnter={e => { 
+                      e.currentTarget.style.transform = 'translateY(-10px) scale(1.02)'; 
+                      e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(79, 70, 229, 0.1), 0 10px 10px -5px rgba(79, 70, 229, 0.04)';
+                      e.currentTarget.querySelector('.course-image').style.transform = 'scale(1.1)';
+                      e.currentTarget.querySelector('.action-btn').style.opacity = '1';
+                      e.currentTarget.querySelector('.action-btn').style.transform = 'translateY(0)';
+                    }}
+                    onMouseLeave={e => { 
+                      e.currentTarget.style.transform = 'translateY(0) scale(1)'; 
+                      e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)';
+                      e.currentTarget.querySelector('.course-image').style.transform = 'scale(1)';
+                      e.currentTarget.querySelector('.action-btn').style.opacity = '0';
+                      e.currentTarget.querySelector('.action-btn').style.transform = 'translateY(10px)';
+                    }}
                   >
-                     <img src={course.image_url} style={{ width: '80px', height: '80px', borderRadius: '1.25rem', objectFit: 'cover' }} />
-                     <div style={{ flex: 1 }}>
-                        <h4 style={{ color: '#1e293b', fontSize: '1.1rem', marginBottom: '0.4rem' }}>{course.title}</h4>
-                        <div className="flex" style={{ gap: '1.5rem', color: '#94a3b8', fontSize: '0.85rem' }}>
-                           <span>{course.lessons_count} Lessons</span>
-                           <span>{course.videos_count} Videos</span>
+                     <div style={{ position: 'relative', height: '220px', overflow: 'hidden' }}>
+                        <img 
+                          src={course.image_url} 
+                          className="course-image"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s ease' }} 
+                        />
+                        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(15, 23, 42, 0.6) 0%, transparent 60%)' }} />
+                        
+                        {/* Price Tag - Glassmorphism */}
+                        <div style={{ 
+                           position: 'absolute', 
+                           top: '1.25rem', 
+                           right: '1.25rem', 
+                           background: isFree(course.price) ? 'rgba(16, 185, 129, 0.9)' : 'rgba(79, 70, 229, 0.9)', 
+                           backdropFilter: 'blur(8px)',
+                           color: 'white', 
+                           padding: '0.5rem 1rem', 
+                           borderRadius: '1rem', 
+                           fontSize: '0.8rem', 
+                           fontWeight: 800,
+                           border: '1px solid rgba(255,255,255,0.2)',
+                           boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                        }}>
+                           {isFree(course.price) ? 'FREE' : `${course.price} EGP`}
+                        </div>
+
+                        {/* Hover Action Button */}
+                        <div className="action-btn" style={{ position: 'absolute', bottom: '1.25rem', right: '1.25rem', opacity: 0, transform: 'translateY(10px)', transition: 'all 0.3s ease' }}>
+                           <div className="centered" style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'white', color: 'var(--primary)', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
+                              <ArrowRight size={20} />
+                           </div>
                         </div>
                      </div>
-                     <ArrowRight size={20} color="#94a3b8" />
+
+                     <div style={{ padding: '1.5rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                           <span style={{ padding: '0.3rem 0.75rem', background: 'rgba(79, 70, 229, 0.05)', color: 'var(--primary)', borderRadius: '0.6rem', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase' }}>
+                              Newest Release
+                           </span>
+                        </div>
+                        <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', lineHeight: '1.4', marginBottom: '0.75rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{course.title}</h4>
+                        
+                        <div className="flexCenteredV" style={{ gap: '0.75rem', marginBottom: '1.25rem' }}>
+                           <img src={course.teacher?.profile_image_url || `https://ui-avatars.com/api/?name=${course.teacher?.name}&background=eff6ff&color=3b82f6`} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
+                           <p style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>{course.teacher?.name}</p>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '1.5rem', color: '#94a3b8', fontSize: '0.8rem', paddingTop: '1.25rem', borderTop: '1px solid #f1f5f9' }}>
+                           <span className="flexCenteredV" style={{ gap: '0.4rem' }}><BookOpen size={14} color="var(--primary)" /> <strong>{course.lessons_count}</strong> Units</span>
+                           <span className="flexCenteredV" style={{ gap: '0.4rem' }}><PlayCircle size={14} color="var(--primary)" /> <strong>{course.videos_count}</strong> Videos</span>
+                        </div>
+                     </div>
                   </div>
                ))}
             </div>
