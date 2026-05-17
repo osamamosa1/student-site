@@ -20,6 +20,56 @@ import {
 } from 'lucide-react';
 import { studentApi } from '../api';
 
+const WatermarkOverlay = () => {
+  const [position, setPosition] = useState({ top: '20%', left: '20%' });
+  const user = JSON.parse(localStorage.getItem('mps_user') || '{}');
+  const userName = user.name || user.Name || 'Student';
+  const userEmail = user.email || '';
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const randomTop = Math.floor(Math.random() * 60) + 20;
+      const randomLeft = Math.floor(Math.random() * 60) + 15;
+      setPosition({ top: `${randomTop}%`, left: `${randomLeft}%` });
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div 
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+        zIndex: 15,
+        overflow: 'hidden'
+      }}
+    >
+      <div 
+        style={{
+          position: 'absolute',
+          top: position.top,
+          left: position.left,
+          color: 'rgba(255, 255, 255, 0.22)',
+          fontSize: 'clamp(11px, 2.2vw, 15px)',
+          fontWeight: '600',
+          whiteSpace: 'nowrap',
+          pointerEvents: 'none',
+          transform: 'translate(-50%, -50%) rotate(-12deg)',
+          transition: 'all 3s ease-in-out',
+          textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
+          fontFamily: 'sans-serif'
+        }}
+      >
+        {userName} {userEmail ? `(${userEmail})` : ''}
+      </div>
+    </div>
+  );
+};
+
 const CoursePlayer = () => {
   const { lessonId } = useParams();
   const navigate = useNavigate();
@@ -140,6 +190,9 @@ const CoursePlayer = () => {
                    zIndex: 10, cursor: 'default', touchAction: 'none' 
                  }} 
                />
+               
+               {/* Randomly moving, semi-transparent user watermark overlay */}
+               <WatermarkOverlay />
                
                {/* Custom Fullscreen Button (Placed above blockers) */}
                <button 
