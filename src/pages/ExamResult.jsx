@@ -89,17 +89,19 @@ const ExamResult = () => {
                 </div>
                 <h4 style={{ fontSize: '1.2rem', marginBottom: '1.5rem' }}>{q.question_text}</h4>
                 
-                {!q.correct && (
-                  <div style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.05)', borderRadius: '0.75rem', marginBottom: '1rem', border: '1px solid rgba(239, 68, 68, 0.1)' }}>
-                     <p style={{ fontSize: '0.8rem', color: '#f87171', fontWeight: 600, marginBottom: '0.25rem' }}>Your Answer</p>
-                     <p style={{ color: 'var(--text-main)' }}>{q.student_answer_text || 'No answer selected'}</p>
-                  </div>
-                )}
-                
-                <div style={{ padding: '1rem', background: 'rgba(16, 185, 129, 0.05)', borderRadius: '0.75rem', border: '1px solid rgba(16, 185, 129, 0.1)' }}>
-                   <p style={{ fontSize: '0.8rem', color: '#10b981', fontWeight: 600, marginBottom: '0.25rem' }}>Correct Answer</p>
-                   <p style={{ color: 'var(--text-main)' }}>{q.correct_option_text}</p>
-                </div>
+                 <div style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.05)', borderRadius: '0.75rem', marginBottom: '1rem', border: `1px solid ${q.correct ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'}` }}>
+                    <p style={{ fontSize: '0.8rem', color: q.correct ? '#10b981' : '#f87171', fontWeight: 600, marginBottom: '0.25rem' }}>Your Answer</p>
+                    <p style={{ color: 'var(--text-main)' }}>
+                        {q.student_answer_text || (q.student_option_id ? `ID: ${q.student_option_id}` : 'No answer selected')}
+                    </p>
+                 </div>
+                 
+                 <div style={{ padding: '1rem', background: 'rgba(16, 185, 129, 0.05)', borderRadius: '0.75rem', border: '1px solid rgba(16, 185, 129, 0.1)' }}>
+                    <p style={{ fontSize: '0.8rem', color: '#10b981', fontWeight: 600, marginBottom: '0.25rem' }}>Correct Answer</p>
+                    <p style={{ color: 'var(--text-main)' }}>
+                        {q.correct_option_text || (q.correct_option_id ? `ID: ${q.correct_option_id}` : 'N/A')}
+                    </p>
+                 </div>
              </div>
            ))}
         </div>
