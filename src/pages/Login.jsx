@@ -56,8 +56,11 @@ const Login = () => {
         return crc(bin + navigator.userAgent + screen.width + screen.height).toString();
       };
 
-      const deviceUuid = getFingerprint();
-      localStorage.setItem('device_uuid', deviceUuid);
+      let deviceUuid = localStorage.getItem('device_uuid');
+      if (!deviceUuid) {
+        deviceUuid = getFingerprint();
+        localStorage.setItem('device_uuid', deviceUuid);
+      }
       
       const response = await authApi.login({ ...formData, device_uuid: deviceUuid });
       if (response.status === 'success' || response.token) {
@@ -66,7 +69,7 @@ const Login = () => {
         navigate('/');
       }
     } catch (err) {
-      setError(err.message || 'Invalid email or password');
+      setError(err.message || (err.response?.data?.message) || 'Invalid email or password');
     } finally {
       setLoading(false);
     }
