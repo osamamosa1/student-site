@@ -60,6 +60,12 @@ const Dashboard = () => {
     navigate('/login');
   };
 
+  // Returns actual courses (no duplication). Pass limit to cap at N items.
+  const getCourses = (coursesList, limit = null) => {
+    if (!coursesList || coursesList.length === 0) return [];
+    return limit ? coursesList.slice(0, limit) : coursesList;
+  };
+
   if (loading) return <div className="centered" style={{ height: '100vh', background: '#f8faff' }}>Loading your dashboard...</div>;
 
   return (
@@ -148,9 +154,10 @@ const Dashboard = () => {
          </div>
 
          <div style={{ display: 'flex', gap: '1.5rem', overflowX: 'auto', padding: '0.5rem 0.25rem 2rem', marginBottom: '2.5rem' }} className="no-scrollbar">
-            {homeData?.most_popular_courses?.slice(0, 8).map(course => (
+            {getCourses(homeData?.most_popular_courses, 6)
+               .map((course, index) => (
                <div
-                  key={course.id}
+                  key={`${course.id}-${index}`}
                   onClick={() => navigate(`/course/${course.id}`)}
                   style={{ 
                     minWidth: '260px', 
@@ -198,9 +205,9 @@ const Dashboard = () => {
 
             {/* Premium New Courses Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
-               {homeData?.new_courses?.slice(0, 6).map(course => (
+               {getCourses(homeData?.new_courses, 6).map((course, index) => (
                   <div
-                    key={course.id}
+                    key={`${course.id}-${index}`}
                     onClick={() => navigate(`/course/${course.id}`)}
                     style={{ 
                       background: 'white', 

@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>حذف الحساب | Delete Account – MPS Platform</title>
+  <meta name="description" content="تعرّف على كيفية حذف حسابك من تطبيق MPS Platform. Learn how to delete your account from the MPS Platform app." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #7c3aed;
+      --primary-light: #a78bfa;
+      --accent: #06b6d4;
+      --accent2: #f472b6;
+      --bg: #0f0c29;
+      --bg2: #1a1245;
+      --glass: rgba(255,255,255,0.06);
+      --glass-border: rgba(255,255,255,0.12);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --danger: #f43f5e;
+      --danger-light: #fda4af;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Cairo', 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(124,58,237,0.35) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 80%, rgba(6,182,212,0.25) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 60% 30%, rgba(244,114,182,0.15) 0%, transparent 60%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Floating orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+      pointer-events: none;
+      z-index: 0;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+    .orb-1 { width: 400px; height: 400px; background: var(--primary); top: -100px; left: -100px; animation-delay: 0s; }
+    .orb-2 { width: 300px; height: 300px; background: var(--accent); bottom: 0; right: -80px; animation-delay: -4s; }
+    .orb-3 { width: 250px; height: 250px; background: var(--accent2); top: 40%; left: 40%; animation-delay: -8s; }
+
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(30px, 40px) scale(1.08); }
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 60px 24px 40px;
+    }
+
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 999px;
+      padding: 8px 20px;
+      margin-bottom: 28px;
+      backdrop-filter: blur(12px);
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      color: var(--primary-light);
+      font-weight: 600;
+    }
+    .logo-badge::before {
+      content: '⬡';
+      font-size: 1rem;
+      color: var(--accent);
+    }
+
+    header h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, #fff 0%, var(--primary-light) 50%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    header p.subtitle {
+      font-size: clamp(0.95rem, 2vw, 1.15rem);
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 32px;
+      line-height: 1.8;
+    }
+
+    /* Language toggle */
+    .lang-toggle {
+      display: inline-flex;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 999px;
+      padding: 4px;
+      gap: 4px;
+      backdrop-filter: blur(12px);
+    }
+    .lang-btn {
+      padding: 8px 24px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: inherit;
+    }
+    .lang-btn.active {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      max-width: 900px;
+      margin: 0 auto 40px;
+      padding: 0 24px;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--glass-border);
+    }
+    .divider-icon {
+      font-size: 1.5rem;
+    }
+
+    /* ── MAIN CONTENT ── */
+    main {
+      position: relative;
+      z-index: 10;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* Warning card */
+    .warning-card {
+      background: linear-gradient(135deg, rgba(244,63,94,0.12), rgba(244,63,94,0.05));
+      border: 1px solid rgba(244,63,94,0.35);
+      border-radius: 20px;
+      padding: 24px 28px;
+      margin-bottom: 40px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      backdrop-filter: blur(12px);
+      animation: fadeUp 0.6s ease both;
+    }
+    .warning-icon {
+      font-size: 1.8rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .warning-card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--danger-light);
+      margin-bottom: 6px;
+    }
+    .warning-card p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* Steps grid */
+    .steps-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: var(--primary-light);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .steps-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, var(--glass-border), transparent);
+    }
+
+    .steps-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .step-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 24px 28px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      backdrop-filter: blur(12px);
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeUp 0.6s ease both;
+      cursor: default;
+    }
+    .step-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary);
+      box-shadow: 0 12px 40px rgba(124,58,237,0.2);
+    }
+    .step-card:nth-child(1) { animation-delay: 0.1s; }
+    .step-card:nth-child(2) { animation-delay: 0.2s; }
+    .step-card:nth-child(3) { animation-delay: 0.3s; }
+    .step-card:nth-child(4) { animation-delay: 0.4s; }
+    .step-card:nth-child(5) { animation-delay: 0.5s; }
+
+    .step-number {
+      min-width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(124,58,237,0.35);
+      flex-shrink: 0;
+    }
+
+    .step-body h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .step-body p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+    }
+    .step-body .chip {
+      display: inline-block;
+      background: rgba(124,58,237,0.2);
+      border: 1px solid rgba(124,58,237,0.35);
+      border-radius: 8px;
+      padding: 3px 10px;
+      font-size: 0.82rem;
+      color: var(--primary-light);
+      margin-top: 8px;
+      font-weight: 600;
+    }
+
+    /* Contact section */
+    .contact-section {
+      margin-top: 48px;
+      background: linear-gradient(135deg, rgba(6,182,212,0.1), rgba(124,58,237,0.08));
+      border: 1px solid rgba(6,182,212,0.25);
+      border-radius: 24px;
+      padding: 32px;
+      text-align: center;
+      backdrop-filter: blur(12px);
+      animation: fadeUp 0.6s 0.6s ease both;
+    }
+    .contact-section h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--accent);
+    }
+    .contact-section p {
+      color: var(--text-muted);
+      font-size: 0.93rem;
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+    .contact-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(124,58,237,0.35);
+    }
+    .contact-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(124,58,237,0.5);
+    }
+
+    /* Language sections */
+    .lang-section { display: none; }
+    .lang-section.visible { display: block; }
+
+    /* Footer */
+    footer {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 24px;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      border-top: 1px solid var(--glass-border);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* RTL/LTR switching */
+    body.ltr { direction: ltr; font-family: 'Inter', 'Cairo', sans-serif; }
+    body.rtl { direction: rtl; font-family: 'Cairo', 'Inter', sans-serif; }
+
+    @media (max-width: 600px) {
+      .step-card { flex-direction: column; gap: 12px; }
+      .step-number { width: 40px; height: 40px; min-width: 40px; font-size: 1rem; }
+      header { padding: 40px 20px 28px; }
+    }
+  </style>
+</head>
+<body class="rtl">
+  <!-- Background orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="logo-badge">MPS Platform</div>
+    <h1 id="main-heading">حذف الحساب</h1>
+    <p class="subtitle" id="main-subtitle">
+      يمكنك حذف حسابك بشكل دائم مباشرةً من داخل التطبيق. يرجى قراءة الخطوات بعناية قبل المتابعة.
+    </p>
+    <div class="lang-toggle" role="group" aria-label="Language selector">
+      <button id="btn-ar" class="lang-btn active" onclick="setLang('ar')" aria-pressed="true">العربية</button>
+      <button id="btn-en" class="lang-btn" onclick="setLang('en')" aria-pressed="false">English</button>
+    </div>
+  </header>
+
+  <div class="divider"><span class="divider-icon">🗑️</span></div>
+
+  <main>
+
+    <!-- ══ ARABIC SECTION ══ -->
+    <div id="section-ar" class="lang-section visible">
+
+      <div class="warning-card" role="alert">
+        <div class="warning-icon">⚠️</div>
+        <div>
+          <h3>تحذير: هذا الإجراء لا يمكن التراجع عنه</h3>
+          <p>سيتم حذف بيانات ملفك الشخصي وبيانات اعتماد تسجيل الدخول بشكل نهائي. لن تتمكن من استرداد حسابك بعد الحذف.</p>
+        </div>
+      </div>
+
+      <div class="steps-title">🪜 خطوات حذف الحساب</div>
+
+      <div class="steps-grid" id="steps-ar">
+        <div class="step-card">
+          <div class="step-number">١</div>
+          <div class="step-body">
+            <h3>افتح التطبيق وسجّل الدخول</h3>
+            <p>تأكد من تسجيل الدخول إلى حسابك على تطبيق MPS Platform بحساب طالب أو معلم.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-number">٢</div>
+          <div class="step-body">
+            <h3>انتقل إلى الإعدادات</h3>
+            <p>اضغط على أيقونة القائمة أو التبويب السفلي للوصول إلى <strong>الإعدادات</strong>.</p>
+            <span class="chip">⚙️ الإعدادات</span>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-number">٣</div>
+          <div class="step-body">
+            <h3>اختر "ملفي الشخصي" أو "تعديل الملف"</h3>
+            <p>اضغط على <strong>"ملفي الشخصي"</strong> من قائمة الإعدادات للانتقال إلى شاشة تعديل الملف الشخصي.</p>
+            <span class="chip">👤 تعديل الملف الشخصي</span>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-number">٤</div>
+          <div class="step-body">
+            <h3>اضغط على زر "حذف الحساب"</h3>
+            <p>في أسفل شاشة تعديل الملف الشخصي، ستجد زر <strong>"حذف الحساب"</strong> باللون الأحمر. اضغط عليه.</p>
+            <span class="chip" style="background:rgba(244,63,94,0.15);border-color:rgba(244,63,94,0.4);color:#fda4af;">🗑️ حذف الحساب</span>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-number">٥</div>
+          <div class="step-body">
+            <h3>قم بتأكيد الحذف في مربع الحوار</h3>
+            <p>سيظهر لك مربع حوار للتأكيد. اضغط على <strong>"نعم، احذف حسابي"</strong> لإتمام الحذف النهائي. سيتم تسجيل خروجك تلقائيًا.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-section">
+        <h3>هل تحتاج إلى مساعدة؟</h3>
+        <p>إذا واجهت أي مشكلة أثناء حذف حسابك أو كانت لديك أي استفسارات، يسعدنا مساعدتك.</p>
+        <a href="mailto:support@mr-abdelrahman.com" class="contact-btn" id="contact-link-ar">
+          ✉️ تواصل مع الدعم
+        </a>
+      </div>
+
+    </div>
+
+    <!-- ══ ENGLISH SECTION ══ -->
+    <div id="section-en" class="lang-section">
+
+      <div class="warning-card" role="alert">
+        <div class="warning-icon">⚠️</div>
+        <div>
+          <h3>Warning: This action is irreversible</h3>
+          <p>Your profile data and login credentials will be permanently deleted. You will not be able to recover your account after deletion.</p>
+        </div>
+      </div>
+
+      <div class="steps-title">🪜 Steps to Delete Your Account</div>
+
+      <div class="steps-grid" id="steps-en">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <div class="step-body">
+            <h3>Open the App & Sign In</h3>
+            <p>Make sure you are logged in to your MPS Platform account as a student or teacher.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <div class="step-body">
+            <h3>Navigate to Settings</h3>
+            <p>Tap the menu icon or the bottom navigation tab to reach <strong>Settings</strong>.</p>
+            <span class="chip">⚙️ Settings</span>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <div class="step-body">
+            <h3>Select "My Profile" or "Edit Profile"</h3>
+            <p>Tap <strong>"My Profile"</strong> from the settings list to navigate to the Edit Profile screen.</p>
+            <span class="chip">👤 Edit Profile</span>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <div class="step-body">
+            <h3>Tap the "Delete Account" Button</h3>
+            <p>At the bottom of the Edit Profile screen, you will find the red <strong>"Delete Account"</strong> button. Tap it.</p>
+            <span class="chip" style="background:rgba(244,63,94,0.15);border-color:rgba(244,63,94,0.4);color:#fda4af;">🗑️ Delete Account</span>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-number">5</div>
+          <div class="step-body">
+            <h3>Confirm Deletion in the Dialog</h3>
+            <p>A confirmation dialog will appear. Tap <strong>"Yes, Delete My Account"</strong> to permanently delete your account. You will be signed out automatically.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-section">
+        <h3>Need Help?</h3>
+        <p>If you encounter any issues deleting your account or have any questions, we're happy to assist you.</p>
+        <a href="mailto:support@mr-abdelrahman.com" class="contact-btn" id="contact-link-en">
+          ✉️ Contact Support
+        </a>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer>
+    <p>© 2025 MPS Platform. All rights reserved. | جميع الحقوق محفوظة.</p>
+  </footer>
+
+  <script>
+    function setLang(lang) {
+      const isAr = lang === 'ar';
+      document.documentElement.lang = lang;
+      document.documentElement.dir = isAr ? 'rtl' : 'ltr';
+      document.body.classList.toggle('rtl', isAr);
+      document.body.classList.toggle('ltr', !isAr);
+
+      document.getElementById('section-ar').classList.toggle('visible', isAr);
+      document.getElementById('section-en').classList.toggle('visible', !isAr);
+
+      document.getElementById('btn-ar').classList.toggle('active', isAr);
+      document.getElementById('btn-en').classList.toggle('active', !isAr);
+      document.getElementById('btn-ar').setAttribute('aria-pressed', isAr);
+      document.getElementById('btn-en').setAttribute('aria-pressed', !isAr);
+
+      if (isAr) {
+        document.getElementById('main-heading').textContent = 'حذف الحساب';
+        document.getElementById('main-subtitle').textContent =
+          'يمكنك حذف حسابك بشكل دائم مباشرةً من داخل التطبيق. يرجى قراءة الخطوات بعناية قبل المتابعة.';
+      } else {
+        document.getElementById('main-heading').textContent = 'Delete Account';
+        document.getElementById('main-subtitle').textContent =
+          'You can permanently delete your account directly from within the app. Please read the steps carefully before proceeding.';
+      }
+    }
+  </script>
+</body>
+</html>

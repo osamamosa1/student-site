@@ -13,6 +13,7 @@ import UnitContents from './pages/UnitContents';
 import Settings from './pages/Settings';
 import ExamResultsList from './pages/ExamResultsList';
 import AllCourses from './pages/AllCourses';
+import DeleteAccountSteps from './pages/DeleteAccountSteps';
 import './index.css';
 
 import { useEffect } from 'react';
@@ -115,6 +116,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/delete-account" element={<DeleteAccountSteps />} />
           <Route 
             path="/" 
             element={

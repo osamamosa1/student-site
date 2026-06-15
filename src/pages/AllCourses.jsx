@@ -16,22 +16,28 @@ const AllCourses = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchCourses = async () => {
       try {
-        const res = await homeApi.getStudentHome();
-        const data = res.data;
-        const courses = type === 'popular'
-          ? (data.most_popular_courses || [])
-          : (data.new_courses || []);
-        setAllCourses(courses);
-        setFiltered(courses);
+        if (type === 'popular') {
+          // For popular: get home data and show ALL most_popular_courses
+          const res = await homeApi.getStudentHome();
+          const popular = res.data?.most_popular_courses || [];
+          setAllCourses(popular);
+          setFiltered(popular);
+        } else {
+          // For new/all: use home API new_courses which returns ALL courses ordered by newest
+          const res = await homeApi.getStudentHome();
+          const courses = res.data?.new_courses || [];
+          setAllCourses(courses);
+          setFiltered(courses);
+        }
       } catch (err) {
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
-    fetch();
+    fetchCourses();
   }, [type]);
 
   useEffect(() => {
