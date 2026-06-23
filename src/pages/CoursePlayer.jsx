@@ -16,7 +16,8 @@ import {
   Eye,
   Menu,
   Maximize,
-  Minimize
+  Minimize,
+  Heart
 } from 'lucide-react';
 import { studentApi } from '../api';
 
@@ -79,6 +80,7 @@ const CoursePlayer = () => {
   const [platformSettings, setPlatformSettings] = useState(null);
   const videoContainerRef = React.useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -113,6 +115,7 @@ const CoursePlayer = () => {
       try {
         const response = await studentApi.getLessonDetails(lessonId);
         setLesson(response.data);
+        setIsFavorite(response.data.is_favorite);
         setPlatformSettings(response.platform_settings);
         
         // Fetch course to get the sidebar/curriculum context
@@ -129,6 +132,16 @@ const CoursePlayer = () => {
     };
     fetchLesson();
   }, [lessonId]);
+
+  const handleToggleFavorite = async () => {
+    if (!lesson) return;
+    try {
+      const res = await studentApi.toggleFavorite(lesson.id);
+      setIsFavorite(res.is_favorite);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   if (loading) return <div className="centered" style={{ height: '100vh', background: '#0f172a' }}>Syncing learning environment...</div>;
   if (!lesson) return <div className="centered white">Lesson not found</div>;
@@ -307,12 +320,21 @@ const CoursePlayer = () => {
   return (
     <div style={{ background: '#f1f5f9', minHeight: '100vh', display: 'flex', color: '#0f172a', flexDirection: 'column' }}>
       {/* Mobile Top Navigation */}
-      <div className="md:hidden flex items-center justify-between p-4 bg-white border-b border-[#e2e8f0] sticky top-0 z-[200]">
-        <button onClick={() => navigate(-1)} className="p-2 text-[#64748b]">
-          <ArrowLeft size={20} />
+      <div className="mobile-top-nav" style={{ display: 'none', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1rem', background: 'linear-gradient(135deg, var(--primary), #4338ca)', color: 'white', position: 'sticky', top: 0, zIndex: 200, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+        <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', color: 'white', padding: '0.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+          <ArrowLeft size={22} />
         </button>
-        <span className="font-bold truncate px-4">{course?.title || 'Course'}</span>
-        <button onClick={() => document.getElementById('course-sidebar')?.classList.toggle('hidden')} className="p-2 text-indigo-600 bg-indigo-50 rounded-lg">
+        <span style={{ fontWeight: '700', fontSize: '0.95rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '0 1rem', flex: 1, textAlign: 'center' }}>{course?.title || 'Syllabus'}</span>
+        <button onClick={() => {
+          const sidebar = document.getElementById('course-sidebar');
+          if (sidebar) {
+            if (sidebar.style.display === 'flex') {
+              sidebar.style.setProperty('display', 'none', 'important');
+            } else {
+              sidebar.style.setProperty('display', 'flex', 'important');
+            }
+          }
+        }} style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)', color: 'white', padding: '0.5rem', borderRadius: '0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
           <Menu size={20} />
         </button>
       </div>
@@ -378,6 +400,25 @@ const CoursePlayer = () => {
                     </div>
                  </div>
                  <div className="flex gap-2 sm:gap-3" style={{ flexShrink: 0 }}>
+                    <button 
+                       onClick={handleToggleFavorite}
+                       className="btn btn-outline animate-heart" 
+                       style={{ 
+                         height: '42px', 
+                         width: '42px',
+                         padding: '0', 
+                         display: 'flex', 
+                         alignItems: 'center', 
+                         justifyContent: 'center',
+                         borderColor: isFavorite ? '#f43f5e' : '#e2e8f0',
+                         background: isFavorite ? 'rgba(244, 63, 94, 0.08)' : 'white',
+                         color: isFavorite ? '#f43f5e' : '#64748b',
+                         transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                       }}
+                       title={isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+                     >
+                       <Heart size={20} fill={isFavorite ? '#f43f5e' : 'none'} style={{ transform: isFavorite ? 'scale(1.1)' : 'scale(1)', transition: 'transform 0.2s' }} />
+                     </button>
                     <button className="btn btn-outline" style={{ height: '42px', padding: '0 1rem' }} onClick={() => {
                         const wa = platformSettings?.whatsapp_number || '201007309722';
                         window.open(`https://wa.me/${wa}`, '_blank');
@@ -401,30 +442,41 @@ const CoursePlayer = () => {
       </div>
 
       <style>{`
-        body { background: #f1f5f9 !important; color: #0f172a !important; }
-        .glass-card { box-shadow: 0 10px 30px -5px rgba(0,0,0,0.05) !important; border: 1px solid #e2e8f0 !important; border-radius: 1.5rem !important; }
-        .main-course-content { flex: 1; padding: 1.5rem; }
-        .player-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
-        
-        @media (min-width: 768px) {
-            .main-course-content { padding: 3rem 4rem; }
-            .player-header { margin-bottom: 3rem; }
-        }
-        
-        @media (max-width: 768px) {
-            #course-sidebar {
-                position: fixed;
-                left: 0;
-                top: 60px;
-                width: 100% !important;
-                height: calc(100vh - 60px);
-                z-index: 1000;
-            }
-            .container { padding: 0 !important; }
-            /* Removed forced 300px iframe height to allow aspect-ratio to work properly */
-            .hide-mobile { display: none; }
-            .header-icon-container { display: none !important; }
-        }
+         body { background: #f1f5f9 !important; color: #0f172a !important; }
+         .glass-card { box-shadow: 0 10px 30px -5px rgba(0,0,0,0.05) !important; border: 1px solid #e2e8f0 !important; border-radius: 1.5rem !important; }
+         .main-course-content { flex: 1; padding: 1rem; width: 100%; min-width: 0; }
+         .player-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+         
+         @media (min-width: 768px) {
+             .main-course-content { padding: 3rem 4rem; }
+             .player-header { margin-bottom: 3rem; }
+             #course-sidebar { display: flex !important; }
+         }
+         
+         @media (max-width: 768px) {
+             .mobile-top-nav { display: flex !important; }
+             #course-sidebar {
+                 display: none;
+                 position: fixed;
+                 left: 0;
+                 top: 60px;
+                 width: 100% !important;
+                 height: calc(100vh - 60px);
+                 z-index: 1000;
+             }
+             .container { padding: 0 !important; }
+             .hide-mobile { display: none; }
+             .header-icon-container { display: none !important; }
+             .player-header {
+                 flex-direction: row;
+                 align-items: center;
+                 justify-content: space-between;
+                 background: white;
+                 padding: 1rem;
+                 border-radius: 1rem;
+                 box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+             }
+         }
       `}</style>
     </div>
   );

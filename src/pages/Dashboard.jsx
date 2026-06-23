@@ -19,7 +19,8 @@ import {
   GraduationCap,
   ArrowRight,
   User,
-  Settings
+  Settings,
+  Heart
 } from 'lucide-react';
 import logo from '../assets/logo.png';
 import { homeApi, studentApi } from '../api';
@@ -98,7 +99,10 @@ const Dashboard = () => {
                    </div>
                 </div>
                <div className="flex" style={{ gap: '1rem' }}>
-                  <button onClick={() => navigate('/settings')} className="centered" style={{ width: '50px', height: '50px', borderRadius: '50%', background: 'rgba(255,255,255,0.15)', color: 'white', border: '1px solid rgba(255,255,255,0.2)' }}>
+                  <button onClick={() => navigate('/favorites')} className="centered" style={{ width: '50px', height: '50px', borderRadius: '50%', background: 'rgba(255,255,255,0.15)', color: 'white', border: '1px solid rgba(255,255,255,0.2)' }} title="المفضلة">
+                     <Heart size={22} fill="white" />
+                  </button>
+                  <button onClick={() => navigate('/settings')} className="centered" style={{ width: '50px', height: '50px', borderRadius: '50%', background: 'rgba(255,255,255,0.15)', color: 'white', border: '1px solid rgba(255,255,255,0.2)' }} title="الإعدادات">
                      <Settings size={22} />
                   </button>
                </div>
@@ -173,8 +177,15 @@ const Dashboard = () => {
                   onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 12px 30px rgba(0,0,0,0.08)'; }}
                   onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.04)'; }}
                >
-                  <div style={{ position: 'relative', height: '150px', overflow: 'hidden' }}>
-                     <img src={course.image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <div style={{ position: 'relative', height: '150px', overflow: 'hidden', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                     {course.image_url && course.image_url !== '/images/placeholder.png' ? (
+                       <img src={course.image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+                     ) : (
+                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', color: '#94a3b8' }}>
+                         <GraduationCap size={40} />
+                         <span style={{ fontSize: '0.75rem', fontWeight: 700 }}>Mr Abdelrahman</span>
+                       </div>
+                     )}
                      <div style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', background: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(4px)', color: 'white', padding: '0.3rem 0.7rem', borderRadius: '0.75rem', fontSize: '0.75rem', fontWeight: 700 }}>
                         {isFree(course.price) ? 'FREE' : `${course.price} EGP`}
                      </div>
@@ -234,12 +245,19 @@ const Dashboard = () => {
                       e.currentTarget.querySelector('.action-btn').style.transform = 'translateY(10px)';
                     }}
                   >
-                     <div style={{ position: 'relative', height: '220px', overflow: 'hidden' }}>
-                        <img 
-                          src={course.image_url} 
-                          className="course-image"
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s ease' }} 
-                        />
+                     <div style={{ position: 'relative', height: '220px', overflow: 'hidden', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {course.image_url && course.image_url !== '/images/placeholder.png' ? (
+                           <img 
+                             src={course.image_url} 
+                             className="course-image"
+                             style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s ease' }} 
+                           />
+                        ) : (
+                           <div className="course-image" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', color: '#94a3b8', transition: 'transform 0.6s ease' }}>
+                             <GraduationCap size={48} />
+                             <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>Mr Abdelrahman</span>
+                           </div>
+                        )}
                         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(15, 23, 42, 0.6) 0%, transparent 60%)' }} />
                         
                         {/* Price Tag - Glassmorphism */}
@@ -315,6 +333,40 @@ const Dashboard = () => {
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         body { background: #f8faff !important; color: #0f172a !important; }
         .glass-card { box-shadow: 0 10px 25px rgba(0,0,0,0.05) !important; border: 1px solid rgba(0,0,0,0.03) !important; border-radius: 1.5rem !important; }
+        
+        @media (max-width: 768px) {
+          .logo-container {
+             width: 60px !important;
+             height: 60px !important;
+             border-radius: 1rem !important;
+          }
+          h2 {
+             font-size: 1.25rem !important;
+          }
+          .space-between.no-mobile-col {
+             margin-bottom: 2rem !important;
+          }
+          .container {
+             padding: 0 1rem !important;
+          }
+          /* New courses grid card layout spacing */
+          div[style*="gridTemplateColumns"] {
+             grid-template-columns: 1fr !important;
+             gap: 1.25rem !important;
+          }
+          /* Card image height reduction on mobile */
+          div[style*="height: 220px"] {
+             height: 160px !important;
+          }
+          div[style*="height: 150px"] {
+             height: 140px !important;
+          }
+          /* Grid padding and outer wrapping card adjustments */
+          div[style*="borderRadius: 2rem 2rem 0 0"] {
+             padding: 1.5rem 1rem !important;
+             border-radius: 1.5rem 1.5rem 0 0 !important;
+          }
+        }
       `}</style>
     </div>
   );

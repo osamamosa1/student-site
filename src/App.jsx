@@ -14,6 +14,8 @@ import Settings from './pages/Settings';
 import ExamResultsList from './pages/ExamResultsList';
 import AllCourses from './pages/AllCourses';
 import DeleteAccountSteps from './pages/DeleteAccountSteps';
+import Favorites from './pages/Favorites';
+import Leaderboard from './pages/Leaderboard';
 import './index.css';
 
 import { useEffect } from 'react';
@@ -198,6 +200,14 @@ function App() {
             } 
           />
           <Route 
+            path="/favorites" 
+            element={
+              <ProtectedRoute>
+                <Favorites />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
             path="/exam-results-list" 
             element={
               <ProtectedRoute>
@@ -212,6 +222,14 @@ function App() {
                 <AllCourses />
               </ProtectedRoute>
             }
+          />
+          <Route 
+            path="/leaderboard/:courseId" 
+            element={
+              <ProtectedRoute>
+                <Leaderboard />
+              </ProtectedRoute>
+            } 
           />
           {/* Placeholder for future routes */}
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -55,7 +55,11 @@ export const studentApi = {
   getStandaloneExamDetails: (id) => api.get(`/student/standalone-exams/${id}`),
   submitStandaloneExam: (id, data) => api.post(`/student/standalone-exams/${id}/submit`, data),
   getStandaloneResults: () => api.get('/student/standalone-exams/results'),
+  getFavorites: () => api.get('/student/favorites'),
+  toggleFavorite: (lessonId) => api.post(`/student/favorites/toggle?lessonId=${lessonId}`),
+  getCourseLeaderboard: (courseId) => api.get(`/student/courses/${courseId}/leaderboard`),
 };
+
 
 export const homeApi = {
   getStudentHome: () => api.get('/student/home'),

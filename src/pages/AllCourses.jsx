@@ -157,12 +157,19 @@ const AllCourses = () => {
                 }}
               >
                 {/* Course Image */}
-                <div style={{ position: 'relative', height: '180px', overflow: 'hidden' }}>
-                  <img
-                    src={course.image_url}
-                    alt={course.title}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
+                <div style={{ position: 'relative', height: '180px', overflow: 'hidden', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {course.image_url && course.image_url !== '/images/placeholder.png' ? (
+                    <img
+                      src={course.image_url}
+                      alt={course.title}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', color: '#94a3b8' }}>
+                      <BookOpen size={48} />
+                      <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>Mr Abdelrahman</span>
+                    </div>
+                  )}
                   <div style={{
                     position: 'absolute', inset: 0,
                     background: 'linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 60%)'

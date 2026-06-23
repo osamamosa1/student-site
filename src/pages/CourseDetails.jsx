@@ -11,7 +11,8 @@ import {
   Clock,
   Lock,
   CheckCircle2,
-  GraduationCap
+  GraduationCap,
+  Trophy
 } from 'lucide-react';
 import { studentApi } from '../api';
 
@@ -59,27 +60,27 @@ const CourseDetails = () => {
   return (
     <div style={{ background: '#f8faff', minHeight: '100vh', paddingBottom: '100px' }}>
       {/* Premium Header Background */}
-      <div style={{ background: 'var(--primary)', height: '280px', position: 'relative', overflow: 'hidden', padding: '2rem' }}>
+      <div style={{ background: 'linear-gradient(135deg, var(--primary), #4338ca)', padding: '2rem 1.5rem 5rem 1.5rem', position: 'relative', overflow: 'hidden', borderRadius: '0 0 2.5rem 2.5rem' }}>
         <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '200px', height: '200px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
         <div style={{ position: 'absolute', bottom: '-20px', left: '10%', width: '100px', height: '100px', borderRadius: '50%', background: 'rgba(255,255,255,0.03)' }} />
         
-        <header className="space-between container" style={{ position: 'relative', zIndex: 10 }}>
-           <button onClick={() => navigate('/')} className="glass centered" style={{ width: '45px', height: '45px', borderRadius: '50%', color: 'white', border: '1px solid rgba(255,255,255,0.2)' }}>
+        <header className="container" style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2.5rem', padding: 0 }}>
+           <button onClick={() => navigate('/')} className="centered" style={{ width: '42px', height: '42px', borderRadius: '50%', color: 'white', border: '1px solid rgba(255,255,255,0.25)', background: 'rgba(255,255,255,0.1)', cursor: 'pointer', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'} onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}>
               <ArrowLeft size={20} />
            </button>
-           <h2 style={{ color: 'white', fontSize: '1.25rem', fontWeight: 600 }}>Course Details</h2>
-           <div style={{ width: '45px' }} />
+           <h2 style={{ color: 'white', fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>Course Details</h2>
+           <div style={{ width: '42px' }} />
         </header>
 
-      <div className="container" style={{ marginTop: '2rem', position: 'relative', zIndex: 10 }}>
-           <span style={{ background: 'rgba(255,255,255,0.15)', color: 'white', padding: '0.4rem 1rem', borderRadius: '2rem', fontSize: '0.8rem', fontWeight: 600, border: '1px solid rgba(255,255,255,0.2)' }}>
+        <div className="container" style={{ position: 'relative', zIndex: 10, padding: 0 }}>
+           <span style={{ background: 'rgba(255,255,255,0.15)', color: 'white', padding: '0.4rem 1rem', borderRadius: '2rem', fontSize: '0.8rem', fontWeight: 600, border: '1px solid rgba(255,255,255,0.25)' }}>
              {course.subject?.name} • {course.grade?.name}
            </span>
-           <h1 style={{ color: 'white', fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', marginTop: '1rem', letterSpacing: '-1px' }}>{course.title}</h1>
+           <h1 style={{ color: 'white', fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', marginTop: '1rem', fontWeight: 850, letterSpacing: '-0.5px', lineHeight: '1.2' }}>{course.title}</h1>
         </div>
       </div>
 
-      <div className="container" style={{ marginTop: '-40px', position: 'relative', zIndex: 20 }}>
+      <div className="container" style={{ marginTop: '-3rem', position: 'relative', zIndex: 20 }}>
          <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
             
             {/* Left Column: Overview & Units */}
@@ -161,35 +162,37 @@ const CourseDetails = () => {
                   <p style={{ fontSize: '0.875rem', color: '#64748b', lineHeight: '1.6', marginBottom: '1.5rem' }}>Expert educator focused on providing the best academic experience through interactive video and comprehensive exams.</p>
                   
                   <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.5rem' }}>
-                     {!isEnrolled ? (
-                        <>
-                           {isFree ? (
-                             <div style={{ padding: '0.75rem 1rem', marginBottom: '1.5rem', background: 'rgba(16, 185, 129, 0.06)', borderRadius: '0.75rem', border: '1px solid rgba(16, 185, 129, 0.15)', textAlign: 'center' }}>
-                               <span style={{ fontSize: '1.5rem', fontWeight: 800, color: '#059669' }}>FREE</span>
-                             </div>
-                           ) : (
-                             <div className="space-between" style={{ marginBottom: '1.5rem' }}>
-                               <span style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Full Course Fee</span>
-                               <span style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a' }}>{course.price} EGP</span>
-                             </div>
-                           )}
+                      {!isEnrolled && !isFree ? (
+                         <>
+                           <div className="space-between" style={{ marginBottom: '1.5rem' }}>
+                             <span style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Full Course Fee</span>
+                             <span style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a' }}>{course.price} EGP</span>
+                           </div>
                            <button 
                              className="btn btn-primary" 
                              style={{ width: '100%', justifyContent: 'center', height: '3.5rem', fontSize: '1.1rem' }}
                              onClick={handleEnroll}
                            >
-                             {isFree ? 'Start Learning' : 'Enroll via WhatsApp'}
+                             Enroll via WhatsApp
                            </button>
-                        </>
-                     ) : (
-                        <div className="centered" style={{ flexDirection: 'column', gap: '1rem', padding: '1rem', background: 'rgba(16, 185, 129, 0.05)', borderRadius: '1rem', border: '1px solid rgba(16, 185, 129, 0.1)' }}>
-                           <CheckCircle2 color="#10b981" size={32} />
-                           <div style={{ textAlign: 'center' }}>
-                              <h4 style={{ color: '#065f46' }}>Successfully Enrolled</h4>
-                              <p style={{ fontSize: '0.8rem', color: '#059669' }}>Access expires: {new Date(course.enrollment?.expiry_date).toLocaleDateString()}</p>
-                           </div>
-                        </div>
-                     )}
+                         </>
+                      ) : (
+                        <button
+                          onClick={() => navigate(`/leaderboard/${id}`)}
+                          style={{ width: '100%', padding: '1.1rem', background: 'linear-gradient(135deg, #4f46e5, #06b6d4)', color: 'white', border: 'none', borderRadius: '0.875rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', fontWeight: 700, fontSize: '1.1rem', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 4px 15px rgba(79, 70, 229, 0.3)' }}
+                          onMouseEnter={e => {
+                            e.currentTarget.style.transform = 'scale(1.02)';
+                            e.currentTarget.style.boxShadow = '0 6px 20px rgba(79, 70, 229, 0.4)';
+                          }}
+                          onMouseLeave={e => {
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.style.boxShadow = '0 4px 15px rgba(79, 70, 229, 0.3)';
+                          }}
+                        >
+                          <Trophy size={20} color="#FFD700" fill="#FFD700" />
+                          View Leaderboard
+                        </button>
+                      )}
                   </div>
                </div>
             </div>
