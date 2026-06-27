@@ -15,61 +15,11 @@ import {
   MessageCircle,
   Eye,
   Menu,
-  Maximize,
-  Minimize,
   Heart
 } from 'lucide-react';
 import { studentApi } from '../api';
-
-const WatermarkOverlay = () => {
-  const [position, setPosition] = useState({ top: '20%', left: '20%' });
-  const user = JSON.parse(localStorage.getItem('mps_user') || '{}');
-  const userName = user.name || user.Name || 'Student';
-  const userEmail = user.email || '';
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const randomTop = Math.floor(Math.random() * 60) + 20;
-      const randomLeft = Math.floor(Math.random() * 60) + 15;
-      setPosition({ top: `${randomTop}%`, left: `${randomLeft}%` });
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div 
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        pointerEvents: 'none',
-        zIndex: 15,
-        overflow: 'hidden'
-      }}
-    >
-      <div 
-        style={{
-          position: 'absolute',
-          top: position.top,
-          left: position.left,
-          color: 'rgba(255, 255, 255, 0.22)',
-          fontSize: 'clamp(11px, 2.2vw, 15px)',
-          fontWeight: '600',
-          whiteSpace: 'nowrap',
-          pointerEvents: 'none',
-          transform: 'translate(-50%, -50%) rotate(-12deg)',
-          transition: 'all 3s ease-in-out',
-          textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
-          fontFamily: 'sans-serif'
-        }}
-      >
-        {userName} {userEmail ? `(${userEmail})` : ''}
-      </div>
-    </div>
-  );
-};
+import YoutubeLessonPlayer from '../components/YoutubeLessonPlayer';
+import ProtectedLinkViewer from '../components/ProtectedLinkViewer';
 
 const CoursePlayer = () => {
   const { lessonId } = useParams();
@@ -78,36 +28,15 @@ const CoursePlayer = () => {
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [platformSettings, setPlatformSettings] = useState(null);
-  const videoContainerRef = React.useRef(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [submitOpen, setSubmitOpen] = useState(false);
+  const [submitUrl, setSubmitUrl] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
-
-  const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      if (videoContainerRef.current?.requestFullscreen) {
-        videoContainerRef.current.requestFullscreen();
-      } else if (videoContainerRef.current?.webkitRequestFullscreen) {
-        videoContainerRef.current.webkitRequestFullscreen();
-      } else if (videoContainerRef.current?.msRequestFullscreen) {
-        videoContainerRef.current.msRequestFullscreen();
-      }
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-      }
-    }
+  const reloadLesson = async () => {
+    const response = await studentApi.getLessonDetails(lessonId);
+    setLesson(response.data);
+    setIsFavorite(response.data.is_favorite);
   };
 
   useEffect(() => {
@@ -143,116 +72,58 @@ const CoursePlayer = () => {
     }
   };
 
+  const handleSubmitAssignment = async () => {
+    if (!submitUrl.trim()) return;
+    setSubmitting(true);
+    try {
+      const res = await studentApi.submitAssignment(lesson.id, submitUrl.trim());
+      setSubmitUrl('');
+      setSubmitOpen(false);
+      const refreshed = await studentApi.getLessonDetails(lessonId);
+      setLesson(refreshed.data);
+      const pts = res.points_added ?? 0;
+      const milestone = res.milestone_reached;
+      if (pts > 0) {
+        let msg = `Assignment submitted! +${pts} points added to leaderboard.`;
+        if (milestone) msg += ` Milestone reached: ${milestone} points!`;
+        alert(msg);
+      }
+    } catch (err) {
+      alert(err?.message || 'Failed to submit assignment');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (loading) return <div className="centered" style={{ height: '100vh', background: '#0f172a' }}>Syncing learning environment...</div>;
   if (!lesson) return <div className="centered white">Lesson not found</div>;
 
   const renderContent = () => {
     switch (lesson.type) {
       case 'video':
-        const videoId = lesson.content?.split('v=')[1]?.split('&')[0] || 
-                        lesson.content?.split('youtu.be/')[1] || 
-                        lesson.content?.split('embed/')[1]?.split('?')[0];
         return (
-           <div className="glass-card" style={{ padding: '0', overflow: 'hidden', background: 'black', borderRadius: isFullscreen ? '0' : '1.5rem', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }}>
-             {/* Wrapper with aspect ratio and custom fullscreen ref */}
-             <div 
-               ref={videoContainerRef}
-               style={{ 
-                 position: 'relative', 
-                 paddingBottom: isFullscreen ? '0' : '56.25%', 
-                 height: isFullscreen ? '100vh' : 0, 
-                 width: isFullscreen ? '100vw' : '100%',
-                 overflow: 'hidden',
-                 background: 'black',
-                 display: 'flex',
-                 alignItems: 'center',
-                 justifyContent: 'center'
-               }}
-             >
-               <iframe 
-                 style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                 src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&iv_load_policy=3&color=white&vq=hd1080&controls=1&disablekb=1&showinfo=0&fs=0&playsinline=1`}
-                 title={lesson.title}
-                 frameBorder="0" 
-                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-               />
-               
-               {/* 
-                  Ultimate Video Protection Overlay
-                  We cover the top and bottom completely to block Title, Channel Name, Share, YouTube Logo, and Watch on YouTube links.
-                  Using clamp() ensures it's at least 60px tall on tiny mobile screens, but scales to 15% on larger screens.
-                  Using rgba(0,0,0,0.01) instead of transparent forces mobile browsers to register the touch event.
-               */}
-               
-               {/* Top Blocker (Title, Channel Name, Share) */}
-               <div 
-                 style={{ 
-                   position: 'absolute', top: 0, left: 0, width: '100%', 
-                   height: 'clamp(60px, 15%, 100px)', 
-                   background: 'rgba(0,0,0,0.01)', 
-                   zIndex: 10, cursor: 'default', touchAction: 'none' 
-                 }} 
-               />
-               
-               {/* Bottom Blocker (YouTube Logo, Watch on YouTube link) */}
-               <div 
-                 style={{ 
-                   position: 'absolute', bottom: 0, left: 0, width: '100%', 
-                   height: 'clamp(60px, 15%, 100px)', 
-                   background: 'rgba(0,0,0,0.01)', 
-                   zIndex: 10, cursor: 'default', touchAction: 'none' 
-                 }} 
-               />
-               
-               {/* Randomly moving, semi-transparent user watermark overlay */}
-               <WatermarkOverlay />
-               
-               {/* Custom Fullscreen Button (Placed above blockers) */}
-               <button 
-                 onClick={toggleFullscreen}
-                 style={{
-                   position: 'absolute',
-                   bottom: '15px',
-                   right: '20px',
-                   zIndex: 20,
-                   background: 'rgba(0,0,0,0.6)',
-                   color: 'white',
-                   border: 'none',
-                   borderRadius: '4px',
-                   padding: '6px',
-                   cursor: 'pointer',
-                   display: 'flex',
-                   alignItems: 'center',
-                   justifyContent: 'center',
-                   transition: '0.2s'
-                 }}
-                 title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-               >
-                 {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
-               </button>
-             </div>
-          </div>
+          <YoutubeLessonPlayer
+            lesson={lesson}
+            courseId={lesson.course?.id || course?.id}
+          />
         );
       case 'text':
         return (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
              <div className="glass-card" style={{ padding: '3rem', background: 'white' }}>
                 <h2 style={{ fontSize: '1.75rem', marginBottom: '1.5rem', color: '#1e293b' }}>{lesson.title}</h2>
-                <div style={{ color: '#475569', lineHeight: '1.8', fontSize: '1.1rem', marginBottom: '2rem' }}>
+                <div style={{ color: '#475569', lineHeight: '1.8', fontSize: '1.1rem', marginBottom: lesson.extra ? '1rem' : 0 }}>
                    {lesson.content}
                 </div>
+                {lesson.extra && (
+                  <>
+                    <h4 className="flexCenteredV" style={{ gap: '0.75rem', color: '#1e293b', marginBottom: '0.5rem' }}>
+                      <FileText size={20} color="var(--primary)" /> Document
+                    </h4>
+                    <ProtectedLinkViewer url={lesson.extra} title={lesson.title} />
+                  </>
+                )}
              </div>
-             {lesson.extra && (
-                <div className="glass-card" style={{ padding: '2rem', background: 'white' }}>
-                   <div className="space-between" style={{ marginBottom: '1.5rem' }}>
-                      <h4 className="flexCenteredV" style={{ gap: '0.75rem', color: '#1e293b' }}><FileText size={20} color="var(--primary)" /> Attachment Preview</h4>
-                      {lesson.type === 'assignment' && (
-                         <a href={lesson.extra} target="_blank" rel="noreferrer" className="btn btn-outline" style={{ fontSize: '0.8rem' }}><Download size={14} /> Download PDF</a>
-                      )}
-                   </div>
-                   <iframe src={lesson.extra} style={{ width: '100%', height: '800px', border: '1px solid #e2e8f0', borderRadius: '1rem' }} />
-                </div>
-             )}
           </div>
         );
       case 'assignment':
@@ -269,15 +140,42 @@ const CoursePlayer = () => {
                    </div>
                 </div>
                 
-                <p style={{ color: '#475569', fontSize: '1.1rem', lineHeight: '1.7', marginBottom: '2.5rem' }}>{lesson.content}</p>
+                <p style={{ color: '#475569', fontSize: '1.1rem', lineHeight: '1.7', marginBottom: '1.5rem' }}>
+                  {lesson.assignment?.description || lesson.content}
+                </p>
 
-             </div>
-             {lesson.extra && (
-                <div className="glass-card" style={{ padding: '2rem', background: 'white' }}>
-                   <h4 className="flexCenteredV" style={{ gap: '0.75rem', color: '#1e293b', marginBottom: '1.5rem' }}><FileText size={20} color="var(--primary)" /> Assignment Resources</h4>
-                   <iframe src={lesson.extra} style={{ width: '100%', height: '800px', border: '1px solid #e2e8f0', borderRadius: '1rem' }} />
+                {lesson.extra && (
+                  <>
+                    <h4 className="flexCenteredV" style={{ gap: '0.75rem', color: '#1e293b', marginBottom: '0.5rem' }}>
+                      <FileText size={20} color="var(--primary)" /> Assignment Resources
+                    </h4>
+                    <ProtectedLinkViewer url={lesson.extra} title={lesson.title} />
+                  </>
+                )}
+
+                <div style={{ marginTop: '2rem', display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
+                  <button className="btn btn-primary" onClick={() => setSubmitOpen(true)}>
+                    Submit Assignment
+                  </button>
+                  {(lesson.assignment_submissions || []).length > 0 && (
+                    <span style={{ color: '#64748b', fontSize: '0.9rem' }}>
+                      {lesson.assignment_submissions.length} submission(s) sent
+                    </span>
+                  )}
                 </div>
-             )}
+
+                {(lesson.assignment_submissions || []).length > 0 && (
+                  <div style={{ marginTop: '1.5rem', padding: '1rem', background: '#f8fafc', borderRadius: '1rem', border: '1px solid #e2e8f0' }}>
+                    <p style={{ fontWeight: 700, marginBottom: '0.75rem', color: '#1e293b' }}>Your submissions</p>
+                    {(lesson.assignment_submissions || []).map((sub) => (
+                      <div key={sub.id} style={{ fontSize: '0.85rem', color: '#475569', marginBottom: '0.5rem' }}>
+                        <ExternalLink size={14} style={{ display: 'inline', marginRight: 6 }} />
+                        {sub.submission_url} · {sub.submitted_at}
+                      </div>
+                    ))}
+                  </div>
+                )}
+             </div>
           </div>
         );
       case 'exam':
@@ -440,6 +338,28 @@ const CoursePlayer = () => {
            </div>
         </main>
       </div>
+
+      {submitOpen && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.5)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div style={{ background: 'white', borderRadius: '1.25rem', padding: '2rem', width: '100%', maxWidth: '480px', boxShadow: '0 25px 50px rgba(0,0,0,0.2)' }}>
+            <h3 style={{ margin: '0 0 0.5rem', color: '#1e293b', fontSize: '1.25rem' }}>Submit Assignment</h3>
+            <p style={{ margin: '0 0 1.25rem', color: '#64748b', fontSize: '0.9rem' }}>Paste the link to your completed file (Google Drive, Dropbox, etc.)</p>
+            <input
+              type="url"
+              value={submitUrl}
+              onChange={(e) => setSubmitUrl(e.target.value)}
+              placeholder="https://drive.google.com/..."
+              style={{ width: '100%', padding: '0.85rem 1rem', borderRadius: '0.75rem', border: '1px solid #e2e8f0', marginBottom: '1.25rem', fontSize: '0.95rem' }}
+            />
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+              <button className="btn btn-outline" onClick={() => setSubmitOpen(false)} disabled={submitting}>Cancel</button>
+              <button className="btn btn-primary" onClick={handleSubmitAssignment} disabled={submitting || !submitUrl.trim()}>
+                {submitting ? 'Submitting...' : 'Submit'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
          body { background: #f1f5f9 !important; color: #0f172a !important; }

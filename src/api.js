@@ -58,6 +58,14 @@ export const studentApi = {
   getFavorites: () => api.get('/student/favorites'),
   toggleFavorite: (lessonId) => api.post(`/student/favorites/toggle?lessonId=${lessonId}`),
   getCourseLeaderboard: (courseId) => api.get(`/student/courses/${courseId}/leaderboard`),
+  awardVideoPoints: (lessonId, courseId) =>
+    api.post('/student/points/video', { lesson_id: lessonId, course_id: courseId }),
+  submitAssignment: (lessonId, submissionUrl) =>
+    api.post(`/student/lessons/${lessonId}/assignment/submit`, { submission_url: submissionUrl }),
+  getCourseMessages: (courseId, afterQuery = '') =>
+    api.get(`/student/courses/${courseId}/messages${afterQuery}`),
+  sendCourseMessage: (courseId, message) =>
+    api.post(`/student/courses/${courseId}/messages`, { message }),
 };
 
 

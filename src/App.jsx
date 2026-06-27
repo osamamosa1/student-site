@@ -16,6 +16,7 @@ import AllCourses from './pages/AllCourses';
 import DeleteAccountSteps from './pages/DeleteAccountSteps';
 import Favorites from './pages/Favorites';
 import Leaderboard from './pages/Leaderboard';
+import CourseChatPage from './pages/CourseChatPage';
 import './index.css';
 
 import { useEffect } from 'react';
@@ -230,6 +231,14 @@ function App() {
                 <Leaderboard />
               </ProtectedRoute>
             } 
+          />
+          <Route
+            path="/course/:id/chat"
+            element={
+              <ProtectedRoute>
+                <CourseChatPage />
+              </ProtectedRoute>
+            }
           />
           {/* Placeholder for future routes */}
           <Route path="*" element={<Navigate to="/" replace />} />

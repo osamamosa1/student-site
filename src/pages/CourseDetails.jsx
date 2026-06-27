@@ -12,7 +12,8 @@ import {
   Lock,
   CheckCircle2,
   GraduationCap,
-  Trophy
+  Trophy,
+  MessageCircle
 } from 'lucide-react';
 import { studentApi } from '../api';
 
@@ -69,7 +70,20 @@ const CourseDetails = () => {
               <ArrowLeft size={20} />
            </button>
            <h2 style={{ color: 'white', fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>Course Details</h2>
-           <div style={{ width: '42px' }} />
+           {isEnrolled ? (
+             <button
+               onClick={() => navigate(`/course/${id}/chat`)}
+               title="Course Chat"
+               className="centered"
+               style={{ width: '42px', height: '42px', borderRadius: '50%', color: 'white', border: '1px solid rgba(255,255,255,0.25)', background: 'rgba(255,255,255,0.1)', cursor: 'pointer', transition: 'background 0.2s' }}
+               onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+               onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+             >
+               <MessageCircle size={20} />
+             </button>
+           ) : (
+             <div style={{ width: '42px' }} />
+           )}
         </header>
 
         <div className="container" style={{ position: 'relative', zIndex: 10, padding: 0 }}>

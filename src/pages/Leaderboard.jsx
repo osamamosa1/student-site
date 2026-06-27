@@ -51,9 +51,18 @@ const Leaderboard = () => {
     );
   }
 
-  const leaderboard = data?.data || [];
-  const myPoints = data?.myPoints ?? 0;
-  const myRank = data?.myRank ?? '-';
+  const leaderboard = (data?.data || []).map((item) => ({
+    rank: item.rank,
+    studentId: item.student_id ?? item.studentId,
+    name: item.name,
+    totalPoints: item.total_points ?? item.totalPoints ?? 0,
+    examPoints: item.exam_points ?? item.examPoints ?? 0,
+    videoPoints: item.video_points ?? item.videoPoints ?? 0,
+    assignmentPoints: item.assignment_points ?? item.assignmentPoints ?? 0,
+    isCurrentStudent: item.is_current_student ?? item.isCurrentStudent ?? false,
+  }));
+  const myPoints = data?.my_points ?? data?.myPoints ?? 0;
+  const myRank = data?.my_rank ?? data?.myRank ?? '-';
 
   const top3 = leaderboard.slice(0, 3);
   const rest = leaderboard.slice(3);
@@ -161,14 +170,14 @@ const Leaderboard = () => {
         )}
 
         {/* Points Info Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
           <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '1rem', padding: '1rem', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
             <div style={{ width: '40px', height: '40px', borderRadius: '0.75rem', background: 'rgba(251,191,36,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Star size={18} color="#fbbf24" fill="#fbbf24" />
             </div>
             <div>
               <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.7rem', margin: 0 }}>Exam Points</p>
-              <p style={{ color: 'white', fontWeight: 700, fontSize: '0.85rem', margin: 0 }}>First attempt score</p>
+              <p style={{ color: 'white', fontWeight: 700, fontSize: '0.85rem', margin: 0 }}>20 pts on first pass</p>
             </div>
           </div>
           <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '1rem', padding: '1rem', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
@@ -177,7 +186,16 @@ const Leaderboard = () => {
             </div>
             <div>
               <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.7rem', margin: 0 }}>Video Points</p>
-              <p style={{ color: 'white', fontWeight: 700, fontSize: '0.85rem', margin: 0 }}>100 pts / video</p>
+              <p style={{ color: 'white', fontWeight: 700, fontSize: '0.85rem', margin: 0 }}>50 pts / video (50% watch)</p>
+            </div>
+          </div>
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '1rem', padding: '1rem', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '0.75rem', background: 'rgba(16,185,129,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <BookOpen size={18} color="#34d399" />
+            </div>
+            <div>
+              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.7rem', margin: 0 }}>Assignment Points</p>
+              <p style={{ color: 'white', fontWeight: 700, fontSize: '0.85rem', margin: 0 }}>10 pts per submission</p>
             </div>
           </div>
         </div>
@@ -228,9 +246,10 @@ const Leaderboard = () => {
                     {item.name}
                     {item.isCurrentStudent && <span style={{ marginLeft: '0.5rem', fontSize: '0.7rem', background: 'rgba(99,102,241,0.3)', color: '#a5b4fc', padding: '0.1rem 0.4rem', borderRadius: '0.5rem', fontWeight: 600 }}>You</span>}
                   </p>
-                  <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.2rem' }}>
+                  <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.2rem', flexWrap: 'wrap' }}>
                     <span style={{ color: 'rgba(255,215,0,0.7)', fontSize: '0.7rem' }}>⭐ {item.examPoints} exam</span>
                     <span style={{ color: 'rgba(129,140,248,0.7)', fontSize: '0.7rem' }}>⚡ {item.videoPoints} video</span>
+                    <span style={{ color: 'rgba(52,211,153,0.7)', fontSize: '0.7rem' }}>📝 {item.assignmentPoints} assignment</span>
                   </div>
                 </div>
 
