@@ -17,6 +17,8 @@ import DeleteAccountSteps from './pages/DeleteAccountSteps';
 import Favorites from './pages/Favorites';
 import Leaderboard from './pages/Leaderboard';
 import CourseChatPage from './pages/CourseChatPage';
+import Competitions from './pages/Competitions';
+import CompetitionMatch from './pages/CompetitionMatch';
 import './index.css';
 
 import { useEffect } from 'react';
@@ -237,6 +239,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <CourseChatPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/course/:id/competitions"
+            element={
+              <ProtectedRoute>
+                <Competitions />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/course/:id/competitions/match/:matchId"
+            element={
+              <ProtectedRoute>
+                <CompetitionMatch />
               </ProtectedRoute>
             }
           />

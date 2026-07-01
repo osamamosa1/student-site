@@ -66,6 +66,13 @@ export const studentApi = {
     api.get(`/student/courses/${courseId}/messages${afterQuery}`),
   sendCourseMessage: (courseId, message) =>
     api.post(`/student/courses/${courseId}/messages`, { message }),
+  getCompetitions: (courseId) => api.get(`/student/courses/${courseId}/competitions`),
+  getCompetitionMatch: (courseId, matchId) =>
+    api.get(`/student/courses/${courseId}/competitions/matches/${matchId}`),
+  submitCompetitionMatch: (courseId, matchId, data) =>
+    api.post(`/student/courses/${courseId}/competitions/matches/${matchId}/submit`, data),
+  getCompetitionMatchResult: (courseId, matchId) =>
+    api.get(`/student/courses/${courseId}/competitions/matches/${matchId}/result`),
 };
 
 

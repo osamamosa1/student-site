@@ -162,20 +162,27 @@ const CourseDetails = () => {
                </div>
             </div>
 
-            {/* Right Column: Instructor & Pricing */}
+            {/* Right Column: Competitions & Pricing */}
             <div>
-               <div className="glass-card" style={{ padding: '2rem', marginBottom: '2rem', background: 'white', position: 'sticky', top: '2rem' }}>
-                  <h4 style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '1.25rem' }}>Academic Instructor</h4>
-                  <div className="flex" style={{ gap: '1rem', marginBottom: '1.5rem' }}>
-                     <img src={course.teacher?.profile_image_url} style={{ width: '64px', height: '64px', borderRadius: '1rem', objectFit: 'cover' }} />
+               <div
+                  className="glass-card"
+                  style={{ padding: '2rem', marginBottom: '1.5rem', background: 'white', position: 'sticky', top: '2rem', cursor: (isEnrolled || isFree) ? 'pointer' : 'default' }}
+                  onClick={() => (isEnrolled || isFree) ? navigate(`/course/${id}/competitions`) : null}
+               >
+                  <h4 style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '1.25rem' }}>المسابقات</h4>
+                  <div className="flex" style={{ gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
+                     <div className="centered" style={{ width: '64px', height: '64px', borderRadius: '1rem', background: 'rgba(79, 70, 229, 0.1)', color: 'var(--primary)' }}>
+                        <Trophy size={32} />
+                     </div>
                      <div>
-                        <h4 style={{ fontSize: '1.1rem', color: '#0f172a' }}>{course.teacher?.name}</h4>
-                        <p style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 600 }}>{course.teacher?.main_subject} Master</p>
+                        <h4 style={{ fontSize: '1.1rem', color: '#0f172a', marginBottom: '0.25rem' }}>الدوري والكأس</h4>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 600 }}>اضغط للدخول للمسابقات</p>
                      </div>
                   </div>
-                  <p style={{ fontSize: '0.875rem', color: '#64748b', lineHeight: '1.6', marginBottom: '1.5rem' }}>Expert educator focused on providing the best academic experience through interactive video and comprehensive exams.</p>
-                  
-                  <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.5rem' }}>
+                  <p style={{ fontSize: '0.875rem', color: '#64748b', lineHeight: '1.6' }}>تنافس مع زملائك في الدوري أو كأس المجموعات. الفوز 3 نقاط والتعادل نقطة واحدة.</p>
+               </div>
+
+               <div className="glass-card" style={{ padding: '2rem', marginBottom: '2rem', background: 'white' }}>
                       {!isEnrolled && !isFree ? (
                          <>
                            <div className="space-between" style={{ marginBottom: '1.5rem' }}>
@@ -207,7 +214,6 @@ const CourseDetails = () => {
                           View Leaderboard
                         </button>
                       )}
-                  </div>
                </div>
             </div>
 
