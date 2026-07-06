@@ -13,7 +13,7 @@ const initials = (name) => {
     .slice(0, 2);
 };
 
-const ChatBubble = ({ message, youLabel = 'You' }) => {
+const ChatBubble = ({ message, youLabel = 'أنت' }) => {
   const isMine = message.is_mine;
   const isTeacher = message.sender_role === 'teacher';
   const senderName = message.sender_name || '';
@@ -170,7 +170,7 @@ const CourseChat = ({ courseId, fullPage = false, courseTitle = '' }) => {
       setMessages((prev) => [...prev, msg]);
       lastIdRef.current = msg.id;
     } catch (err) {
-      alert(err?.message || 'Failed to send');
+      alert(err?.message || 'فشل الإرسال');
     } finally {
       setSending(false);
     }
@@ -199,8 +199,8 @@ const CourseChat = ({ courseId, fullPage = false, courseTitle = '' }) => {
         {messages.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#94a3b8' }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>💬</div>
-            <p style={{ fontWeight: 600 }}>No messages yet</p>
-            <p style={{ fontSize: '0.85rem', marginTop: 4 }}>Start the conversation with your instructor</p>
+            <p style={{ fontWeight: 600 }}>لا توجد رسائل بعد</p>
+            <p style={{ fontSize: '0.85rem', marginTop: 4 }}>ابدأ المحادثة مع المدرس</p>
           </div>
         ) : (
           messages.map((m) => <ChatBubble key={m.id} message={m} />)
@@ -221,7 +221,7 @@ const CourseChat = ({ courseId, fullPage = false, courseTitle = '' }) => {
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Type a message..."
+          placeholder="اكتب رسالتك..."
           style={{
             flex: 1,
             padding: '0.75rem 1rem',

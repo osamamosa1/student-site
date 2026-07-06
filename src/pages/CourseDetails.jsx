@@ -162,8 +162,28 @@ const CourseDetails = () => {
                </div>
             </div>
 
-            {/* Right Column: Competitions & Pricing */}
+            {/* Right Column: Chat, Competitions & Pricing */}
             <div>
+               {(isEnrolled || isFree) && (
+               <div
+                  className="glass-card"
+                  style={{ padding: '2rem', marginBottom: '1.5rem', background: 'linear-gradient(135deg, #0f172a, #312e81)', cursor: 'pointer', position: 'relative', overflow: 'hidden' }}
+                  onClick={() => navigate(`/course/${id}/chat`)}
+               >
+                  <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }} />
+                  <h4 style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.8rem', fontWeight: 700, marginBottom: '1rem' }}>💬 شات الكورس</h4>
+                  <div className="flex" style={{ gap: '1rem', alignItems: 'center' }}>
+                     <div className="centered" style={{ width: 56, height: 56, borderRadius: '1rem', background: 'rgba(255,255,255,0.15)', color: 'white' }}>
+                        <MessageCircle size={28} />
+                     </div>
+                     <div>
+                        <h4 style={{ fontSize: '1.1rem', color: 'white', marginBottom: 4 }}>تواصل مع المدرس</h4>
+                        <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)' }}>رسائل فورية — نفس التطبيق</p>
+                     </div>
+                  </div>
+               </div>
+               )}
+
                <div
                   className="glass-card"
                   style={{ padding: '2rem', marginBottom: '1.5rem', background: 'white', position: 'sticky', top: '2rem', cursor: (isEnrolled || isFree) ? 'pointer' : 'default' }}

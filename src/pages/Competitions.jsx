@@ -36,12 +36,13 @@ const Competitions = () => {
   const phaseLabel = { groups: 'دور المجموعات', knockout: 'خروج المغلوب', finished: 'انتهت', league: 'الدوري' };
 
   const statusLabel = (m) => {
+    const roundScore = m.my_round_score != null ? ` · جولتك: ${m.my_round_score}` : '';
     if (m.stage === 'knockout') {
       const prefix = `كأس · جولة ${m.knockout_round || ''} · `;
       if (m.status === 'completed') {
         const draw = m.is_draw ? ' (تعادل)' : '';
         const win = m.i_won ? ' ✅' : '';
-        return `${prefix}${m.my_score ?? '-'} - ${m.opponent_score ?? '-'}${draw}${win}`;
+        return `${prefix}${m.my_score ?? '-'} - ${m.opponent_score ?? '-'}${draw}${win}${roundScore}`;
       }
       if (m.status === 'partial') return `${prefix}في انتظار الخصم`;
       return `${prefix}لم تبدأ بعد`;
@@ -102,6 +103,19 @@ const Competitions = () => {
           </div>
         ) : (
           <>
+            {comp.active_round && (
+              <div style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', borderRadius: '1rem', padding: '1.25rem', marginBottom: '1.5rem', color: 'white' }}>
+                <p style={{ margin: 0, fontWeight: 800, fontSize: '1.05rem' }}>🔴 الجولة {comp.active_round.round_number} نشطة الآن</p>
+                <p style={{ margin: '0.35rem 0 0', fontSize: '0.85rem', opacity: 0.9 }}>
+                  {comp.active_round.questions_per_round} أسئلة · {Math.round((comp.active_round.time_limit_seconds || 900) / 60)} دقيقة · تسليم تلقائي
+                </p>
+              </div>
+            )}
+            {!comp.active_round && (
+              <div style={{ background: '#fef3c7', border: '1px solid #fde68a', borderRadius: '1rem', padding: '1rem', marginBottom: '1rem', color: '#92400e', fontSize: '0.9rem', fontWeight: 600 }}>
+                في انتظار المدرس لبدء الجولة التالية
+              </div>
+            )}
             {comp.direct_advance && (
               <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '1rem', padding: '1rem', marginBottom: '1rem', color: '#92400e', fontSize: '0.9rem', fontWeight: 600 }}>
                 أنت متأهل مباشرة من دور المجموعات

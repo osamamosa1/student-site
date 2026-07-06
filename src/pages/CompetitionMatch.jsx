@@ -102,8 +102,13 @@ const CompetitionMatch = () => {
           <p style={{ opacity: 0.7, marginBottom: '1rem' }}>الوقت: {formatTimer(result.time_taken_seconds || 0)}</p>
           {result.waiting_for_opponent ? (
             <p style={{ background: 'rgba(251,191,36,0.15)', padding: '1rem', borderRadius: '0.75rem', color: '#fcd34d' }}>
-              في انتظار خصمك ({match.opponent_name}) لإنهاء الامتحان...
+              الجولة {result.round_number}: في انتظار {match.opponent_name}...
             </p>
+          ) : result.round_complete ? (
+            <div style={{ background: 'rgba(255,255,255,0.06)', padding: '1rem', borderRadius: '0.75rem' }}>
+              <p>جولتك: {result.score} — خصمك: {result.opponent_round_score ?? '?'}</p>
+              <p style={{ marginTop: 8, opacity: 0.8 }}>المجموع: {result.cumulative_my_score} - {result.cumulative_opponent_score}</p>
+            </div>
           ) : (
             <div style={{ background: 'rgba(255,255,255,0.06)', padding: '1rem', borderRadius: '0.75rem' }}>
               {result.is_draw && <p>تعادل!</p>}
@@ -131,7 +136,7 @@ const CompetitionMatch = () => {
             <ArrowLeft size={22} />
           </button>
           <div>
-            <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.6 }}>مباراة vs {match.opponent_name}</p>
+            <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.6 }}>جولة {match.round_number || ''} · vs {match.opponent_name}</p>
             <h2 style={{ margin: 0, fontSize: '1.1rem' }}>{questions.length} أسئلة</h2>
           </div>
         </div>

@@ -50,7 +50,7 @@ const CourseChatPage = () => {
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'white' }}>
             <MessageCircle size={18} />
-            <h1 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>Course Chat</h1>
+            <h1 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>شات الكورس</h1>
           </div>
           {courseTitle && (
             <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'rgba(255,255,255,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
