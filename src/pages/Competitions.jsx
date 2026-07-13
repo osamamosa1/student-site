@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trophy, Swords, Play, Hourglass, Clock, ChevronDown, ChevronUp, Eye, X, Loader2 } from 'lucide-react';
 import { studentApi } from '../api';
 import KnockoutBracket from '../components/KnockoutBracket';
+import { prepareForCompetition } from '../utils/assessmentSessionSync';
 
 const sortMatches = (matches) =>
   [...(matches || [])].sort((a, b) => {
@@ -167,7 +168,17 @@ const Competitions = () => {
           <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
             {canPlay && (
               <button
-                onClick={() => navigate(`/course/${courseId}/competitions/match/${m.id}`)}
+                onClick={async () => {
+                  const roundId = comp?.active_round?.id;
+                  if (roundId) {
+                    const gate = await prepareForCompetition(parseInt(courseId, 10), m.id, roundId);
+                    if (!gate.allowed) {
+                      alert(gate.message);
+                      return;
+                    }
+                  }
+                  navigate(`/course/${courseId}/competitions/match/${m.id}`);
+                }}
                 style={{ flex: 1, padding: '0.7rem', background: 'var(--primary)', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem', fontSize: '0.88rem' }}
               >
                 <Play size={16} fill="white" /> العب

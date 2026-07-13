@@ -20,6 +20,7 @@ import CourseChatPage from './pages/CourseChatPage';
 import Competitions from './pages/Competitions';
 import CompetitionMatch from './pages/CompetitionMatch';
 import './index.css';
+import { flushAllPending } from './utils/assessmentSessionSync';
 
 import { useEffect } from 'react';
 
@@ -116,6 +117,12 @@ const SecurityLayer = ({ children }) => {
 };
 
 function App() {
+  useEffect(() => {
+    if (localStorage.getItem('mps_token')) {
+      flushAllPending();
+    }
+  }, []);
+
   return (
     <SecurityLayer>
       <BrowserRouter>

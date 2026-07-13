@@ -73,13 +73,26 @@ const CourseDetails = () => {
            {isEnrolled ? (
              <button
                onClick={() => navigate(`/course/${id}/chat`)}
-               title="Course Chat"
                className="centered"
-               style={{ width: '42px', height: '42px', borderRadius: '50%', color: 'white', border: '1px solid rgba(255,255,255,0.25)', background: 'rgba(255,255,255,0.1)', cursor: 'pointer', transition: 'background 0.2s' }}
+               style={{
+                 display: 'flex',
+                 alignItems: 'center',
+                 gap: '0.5rem',
+                 padding: '0.5rem 1rem',
+                 borderRadius: '12px',
+                 color: 'white',
+                 border: '1px solid rgba(255,255,255,0.25)',
+                 background: 'rgba(255,255,255,0.1)',
+                 cursor: 'pointer',
+                 transition: 'background 0.2s',
+                 fontWeight: 700,
+                 fontSize: '0.85rem',
+               }}
                onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
                onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
              >
-               <MessageCircle size={20} />
+               <MessageCircle size={18} />
+               <span>شات الكورس</span>
              </button>
            ) : (
              <div style={{ width: '42px' }} />

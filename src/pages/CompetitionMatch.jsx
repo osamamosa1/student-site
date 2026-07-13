@@ -2,6 +2,18 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, Clock } from 'lucide-react';
 import { studentApi } from '../api';
+import {
+  AssessmentSessionType,
+  buildSessionKey,
+  getSession,
+  startSession,
+  updateAnswer,
+} from '../utils/assessmentSessionStorage';
+import {
+  abandonSession,
+  markCompleted,
+  prepareForCompetition,
+} from '../utils/assessmentSessionSync';
 
 const CompetitionMatch = () => {
   const { id: courseId, matchId } = useParams();
@@ -14,6 +26,8 @@ const CompetitionMatch = () => {
   const [result, setResult] = useState(null);
   const startTimeRef = useRef(null);
   const submittedRef = useRef(false);
+  const abandonedRef = useRef(false);
+  const sessionKeyRef = useRef(null);
 
   const getTimeTaken = useCallback(() => {
     if (!match?.time_limit_seconds || !startTimeRef.current) return 0;
@@ -40,6 +54,7 @@ const CompetitionMatch = () => {
       };
       const res = await studentApi.submitCompetitionMatch(courseId, matchId, payload);
       const data = res.data || res;
+      if (sessionKeyRef.current) await markCompleted(sessionKeyRef.current);
       setResult(data);
     } catch (e) {
       submittedRef.current = false;
@@ -53,9 +68,41 @@ const CompetitionMatch = () => {
       try {
         const res = await studentApi.getCompetitionMatch(courseId, matchId);
         const data = res.data || res;
+
+        if (data.round_id) {
+          const gate = await prepareForCompetition(
+            parseInt(courseId, 10),
+            parseInt(matchId, 10),
+            data.round_id,
+          );
+          if (!gate.allowed) {
+            alert(gate.message);
+            navigate(`/course/${courseId}/competitions`);
+            return;
+          }
+          sessionKeyRef.current = buildSessionKey(
+            AssessmentSessionType.COMPETITION_MATCH,
+            parseInt(matchId, 10),
+            parseInt(courseId, 10),
+            data.round_id,
+          );
+        }
+
         setMatch(data);
         startTimeRef.current = Date.now();
         setTimeLeft(data.time_limit_seconds || 900);
+
+        if (sessionKeyRef.current && !getSession(sessionKeyRef.current)) {
+          startSession({
+            type: AssessmentSessionType.COMPETITION_MATCH,
+            targetId: parseInt(matchId, 10),
+            courseId: parseInt(courseId, 10),
+            roundId: data.round_id,
+            questionIds: (data.questions || []).map((q) => q.id),
+            durationSeconds: data.time_limit_seconds || 900,
+            title: data.opponent_name,
+          });
+        }
       } catch (e) {
         console.error(e);
         alert('تعذر تحميل المباراة');
@@ -77,8 +124,34 @@ const CompetitionMatch = () => {
     return () => clearInterval(t);
   }, [timeLeft, result, submitting, doSubmit]);
 
+  useEffect(() => {
+    const onLeave = () => {
+      if (!submittedRef.current && !abandonedRef.current && sessionKeyRef.current) {
+        abandonSession(sessionKeyRef.current);
+        abandonedRef.current = true;
+      }
+    };
+    const handleBeforeUnload = () => onLeave();
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      onLeave();
+    };
+  }, []);
+
+  const handleBack = async () => {
+    if (!submittedRef.current && !abandonedRef.current && sessionKeyRef.current) {
+      abandonedRef.current = true;
+      await abandonSession(sessionKeyRef.current);
+    }
+    navigate(`/course/${courseId}/competitions`);
+  };
+
   const handleSelect = (qId, oId) => {
     setAnswers((prev) => ({ ...prev, [qId]: oId }));
+    if (sessionKeyRef.current) {
+      updateAnswer(sessionKeyRef.current, qId, oId);
+    }
   };
 
   const formatTimer = (sec) => {
@@ -132,7 +205,7 @@ const CompetitionMatch = () => {
     <div style={{ minHeight: '100vh', background: '#020617', color: 'white', paddingBottom: '2rem' }}>
       <header style={{ padding: '1rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <button onClick={() => navigate(`/course/${courseId}/competitions`)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>
+          <button onClick={handleBack} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>
             <ArrowLeft size={22} />
           </button>
           <div>
