@@ -49,6 +49,8 @@ const CoursePlayer = () => {
         
         // Fetch course to get the sidebar/curriculum context
         const courseId = response.data.course?.id;
+        const unitId = response.data.unit?.id;
+        if (unitId) sessionStorage.setItem('last_unit_id', String(unitId));
         if (courseId) {
            const courseRes = await studentApi.getCourseDetails(courseId);
            setCourse(courseRes.data);
@@ -203,7 +205,10 @@ const CoursePlayer = () => {
                 </div>
              </div>
              <button 
-                onClick={() => navigate(`/exam/${lesson.id}`)}
+                onClick={() => {
+                  if (lesson?.unit?.id) sessionStorage.setItem('last_unit_id', String(lesson.unit.id));
+                  navigate(`/exam/${lesson.id}`);
+                }}
                 className="btn btn-primary" 
                 style={{ padding: '1rem 3rem', fontSize: '1.1rem', borderRadius: '3rem' }}
              >
