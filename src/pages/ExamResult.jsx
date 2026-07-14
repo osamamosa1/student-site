@@ -69,11 +69,18 @@ const ExamResult = () => {
              </div>
           </div>
 
-          <div className="flex" style={{ gap: '1rem', marginTop: '2rem' }}>
-             <button className="btn btn-outline" onClick={() => navigate(-2)}>
-                <ArrowLeft size={18} /> Back to Course
+          <div className="flex" style={{ gap: '1rem', marginTop: '2rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+             <button className="btn btn-primary" onClick={() => {
+                const unitId = result.unit_id
+                  || Number(sessionStorage.getItem('last_unit_id') || 0)
+                  || null;
+                if (unitId) navigate(`/unit/${unitId}`);
+                else if (result.course_id) navigate(`/course/${result.course_id}`);
+                else navigate(-2);
+             }}>
+                <ArrowLeft size={18} /> العودة للكورس
              </button>
-             <button className="btn btn-primary" onClick={() => navigate('/')}>
+             <button className="btn btn-outline" onClick={() => navigate('/')}>
                 <LayoutDashboard size={18} /> Dashboard
              </button>
           </div>

@@ -24,6 +24,7 @@ const UnitContents = () => {
       try {
         const response = await studentApi.getUnitDetails(unitId);
         setUnit(response.data);
+        if (unitId) sessionStorage.setItem('last_unit_id', String(unitId));
       } catch (err) {
         console.error(err);
       } finally {
@@ -31,6 +32,10 @@ const UnitContents = () => {
       }
     };
     fetchUnit();
+
+    const onFocus = () => fetchUnit();
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
   }, [unitId]);
 
   if (loading) return <div className="centered" style={{ height: '100vh' }}>Syncing lessons...</div>;
