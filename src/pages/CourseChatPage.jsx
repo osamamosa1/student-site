@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, MessageCircle } from 'lucide-react';
-import CourseChat from '../components/CourseChat';
+import { ArrowLeft, Shield } from 'lucide-react';
 import { studentApi } from '../api';
 import { useEffect, useState } from 'react';
 
@@ -49,7 +48,7 @@ const CourseChatPage = () => {
         </button>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'white' }}>
-            <MessageCircle size={18} />
+            <Shield size={18} />
             <h1 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>Course Chat</h1>
           </div>
           {courseTitle && (
@@ -60,8 +59,40 @@ const CourseChatPage = () => {
         </div>
       </div>
 
-      <div style={{ maxWidth: 720, margin: '0 auto', background: 'white', minHeight: 'calc(100vh - 72px)' }}>
-        <CourseChat courseId={parseInt(id, 10)} fullPage courseTitle={courseTitle} />
+      <div style={{ maxWidth: 560, margin: '2rem auto', padding: '0 1.25rem' }}>
+        <div
+          style={{
+            background: 'white',
+            borderRadius: 16,
+            padding: '2rem 1.5rem',
+            border: '1px solid #e2e8f0',
+            textAlign: 'center',
+          }}
+        >
+          <div
+            style={{
+              width: 72,
+              height: 72,
+              margin: '0 auto 1rem',
+              borderRadius: '50%',
+              background: '#fef3c7',
+              border: '2px solid #f59e0b',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#d97706',
+            }}
+          >
+            <Shield size={32} />
+          </div>
+          <h2 style={{ margin: '0 0 0.75rem', fontSize: '1.25rem', color: '#0f172a' }}>
+            Course chat is turned off for students
+          </h2>
+          <p style={{ margin: 0, color: '#64748b', lineHeight: 1.6 }}>
+            To keep children safe online, students cannot send or receive freeform messages in course chat.
+            Messaging with other students is not allowed. This supports Google Play Families Policy.
+          </p>
+        </div>
       </div>
     </div>
   );
