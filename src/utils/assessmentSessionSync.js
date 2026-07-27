@@ -62,6 +62,13 @@ export async function submitSession(session) {
 
 async function submitIfNeeded(session) {
   if (session.status === AssessmentSessionStatus.SYNCED) return;
+  
+  const hasAnswers = session.answers && Object.keys(session.answers).length > 0;
+  if (!hasAnswers) {
+    deleteSession(session.key);
+    return;
+  }
+
   const toSubmit =
     session.status === AssessmentSessionStatus.IN_PROGRESS
       ? { ...session, status: AssessmentSessionStatus.PENDING_SYNC, abandoned: true }
@@ -83,6 +90,13 @@ export async function abandonSession(key) {
   if (session.status === AssessmentSessionStatus.SYNCED && session.type === AssessmentSessionType.COMPETITION_MATCH) {
     return;
   }
+
+  const hasAnswers = session.answers && Object.keys(session.answers).length > 0;
+  if (!hasAnswers) {
+    deleteSession(key);
+    return;
+  }
+
   const abandoned = {
     ...session,
     status: AssessmentSessionStatus.PENDING_SYNC,
